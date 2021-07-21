@@ -1,0 +1,78 @@
+.searchList {
+  height: 100vh;
+  background: #f4f6fa;
+  padding-top: 10px;
+  .search_content {
+    background-color: #fff;
+    padding: 20px;
+    margin: 15px 30px;
+    .search_condition {
+      display: flex;
+      flex-wrap: wrap;
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
+      .condition_div {
+        display: flex;
+        align-items: center;
+        margin: 0px 15px 15px 0px;
+        .div_title {
+          font-size: 14px;
+          font-weight: 400;
+          color: #333333;
+          margin-right: 8px;
+        }
+      }
+      .search_action {
+        display: flex;
+        .action_position {
+          &:not(:last-child) {
+            margin: 0px 20px 10px 0px;
+          }
+
+          &.action_upload {
+            .ant-upload-list {
+              display: none;
+            }
+          }
+        }
+      }
+    }
+    .list_action {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 10px;
+    }
+    .search_list {
+      .table_action {
+        cursor: pointer;
+        .ant-btn {
+          height: 27px;
+          padding: 2px 8px;
+        }
+      }
+      .search_list_page {
+        display: flex;
+        justify-content: flex-end;
+        margin: 15px;
+      }
+    }
+  }
+}
+// 结算审核弹窗
+.settle_modal {
+  .modal_item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0px 15px 15px 0px;
+    .modal_title {
+      font-size: 14px;
+      font-weight: 400;
+      color: #333333;
+      margin-right: 8px;
+      min-width: 90px;
+      text-align: right;
+    }
+  }
+}
