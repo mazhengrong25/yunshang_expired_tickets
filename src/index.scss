@@ -1,0 +1,21 @@
+// 引入样式表
+@import "~antd/dist/antd.css";
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+// 弹窗
+.ant-modal {
+
+  .ant-modal-content {
+   
+    .ant-modal-title {
+      text-align: center;
+    }
+    .ant-modal-footer {
+      text-align: center;
+    }
+  }
+}
