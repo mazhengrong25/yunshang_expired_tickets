@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-20 17:25:42
+ * @LastEditTime: 2021-07-26 10:06:42
  * @LastEditors: mzr
  */
 import React, { Component } from 'react'
@@ -19,13 +19,13 @@ import {
   Button,
   Tooltip,
   Modal,
-  Upload
+  Upload,
 } from 'antd';
 
+import Header from "../../component/header/header" // 头部横幅
 
 const { Column } = Table;
 const { Option } = Select;
-
 export default class searchList extends Component {
   constructor(props) {
     super(props);
@@ -65,7 +65,7 @@ export default class searchList extends Component {
 
       // 上传文件
       fileList: [],
-      uploading: false, 
+      uploading: false,
 
       showModal: false, //  弹窗展示
       modalData: {
@@ -80,15 +80,17 @@ export default class searchList extends Component {
   }
 
   async componentDidMount() {
-
+    
     await this.getSearchList();   // 列表数据
     await this.getApplyStatus();  // 使用状态
     await this.getScannerData();  // 扫描系统
     await this.getRecentSettle(); // 近期审核
+    
   }
 
+
   // 查询列表
-  getSearchList (){
+  getSearchList() {
     let data = {
       page_no: this.state.paginationData.pageNo,                //类型：Number  必有字段  备注：页码
       page_size: this.state.paginationData.pageCount,               //类型：Number  必有字段  备注：每页显示条数
@@ -120,7 +122,7 @@ export default class searchList extends Component {
 
   // 分页
   changePage = (page, pageSize) => {
-    console.log(page,pageSize)
+    console.log(page, pageSize)
     let data = this.state.paginationData;
     data["pageNo"] = page;
     data["pageCount"] = pageSize;
@@ -245,6 +247,29 @@ export default class searchList extends Component {
       } else {
         message.error(res.statusText)
       }
+    })
+  }
+
+  // 报表下载
+  reportLoad = () => {
+
+    this.$axios.post("api/OverdueTicket/DownloadReport", this.state.searchData,{ responseType: 'arraybuffer', }).then((res) => {
+      if (res.status === 200) {
+        const data = res.data
+        const url = window.URL.createObjectURL(new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }))
+        const link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', `报表${this.$moment().format("X")}.xls`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+      } else {
+        message.error(res.statusText)
+      }
+        
+      
     })
   }
 
@@ -394,8 +419,8 @@ export default class searchList extends Component {
 
     return (
       <div className="searchList">
+        <Header history ={this.props.history}></Header>
         <div className="search_content">
-
           {/* 筛选条件 */}
           <div className="search_condition">
 
@@ -545,10 +570,11 @@ export default class searchList extends Component {
               </div>
             </div>
 
+            {/* 表格操作 */}
             <div className="search_action">
 
               <div className="action_position"><Button type="primary" onClick={this.searchData}>查询</Button></div>
-              
+
               {this.state.recentData ? (
 
                 <div className="action_position">
@@ -572,13 +598,17 @@ export default class searchList extends Component {
                   ) : ""
                 }
                 <Upload {...props}>
-                {
-                  this.state.fileList.length > 0 ?
-                    (<span style={{ marginLeft: 10 }}>{this.state.fileList[0].name} <span onClick={this.removeFileBtn} style={{ color: 'red', fontSize: 12, cursor: 'pointer' }}>删除</span></span>)
-                    : (<Button type="primary">文件上传</Button>)
-                }
+                  {
+                    this.state.fileList.length > 0 ?
+                      (<span style={{ marginLeft: 10 }}>{this.state.fileList[0].name} <span onClick={this.removeFileBtn} style={{ color: 'red', fontSize: 12, cursor: 'pointer' }}>删除</span></span>)
+                      : (<Button type="primary">文件上传</Button>)
+                  }
 
                 </Upload>
+              </div>
+
+              <div className="action_position">
+                <Button type="primary" onClick={this.reportLoad}>报表下载</Button>
               </div>
 
             </div>

@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: mzr
  * @Date: 2021-07-08 14:01:46
- * @LastEditTime: 2021-07-08 16:46:24
+ * @LastEditTime: 2021-07-23 18:22:03
  * @LastEditors: mzr
  */
 import axios from "axios";
@@ -19,7 +19,7 @@ import { message } from "antd"
 
 // axios.defaults.baseURL = baseUrl;
 
-let instance = axios.create({
+let instance = axios.create({ 
   timeout: 1000 * 12,
 });
 

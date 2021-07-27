@@ -1,57 +1,97 @@
 /*
- * @Description: 初始加载页
+ * @Description: 登录页面
  * @Author: mzr
  * @Date: 2021-07-08 11:19:33
- * @LastEditTime: 2021-07-08 14:11:35
+ * @LastEditTime: 2021-07-26 09:46:06
  * @LastEditors: mzr
  */
 import React, { Component } from 'react'
 import '../index/index.scss'
 
-import { Spin , message} from 'antd';
+import {
+  Input,
+  message,
+  Button 
+} from 'antd';
 
-import axios from "../../api/api"
+import logo from "../../static/logo.png" // 登录图标
 
 export default class index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: '',
-      key_id: '',
+
+      userMessage : {
+        userName:"", // 用户名
+        password:"", // 密码
+      }
     };
   }
 
   async componentDidMount() {
-    let data = React.$filterUrlParams(this.props.location.search)
-    console.log(data)
-    await this.setState({
-      url: data.url,
-      key_id: data.token
-    });
-    await this.getToken();
+    
   }
 
-  // 
-  getToken() {
+  // 登录
+  getLogin() {
     let data = {
-      key: this.state.key_id || 0,
-    };
-    
-    axios.get('api/token/Authenticate', { params: data },{type: 'Auth'}).then((res) => {
-      console.log(res);
-      if (res.data.status === 0) {
-        localStorage.setItem('token', res.data.token);
-        this.props.history.push(this.state.url);
-      } else {
+      userName : this.state.userMessage.userName,
+      password : this.state.userMessage.password
+    }
+    this.$axios.post("api/Token/Login",data).then((res) => {
+      if(res.data.status === 0) {
+        localStorage.setItem('token',res.data.token)
+        localStorage.setItem('username',this.state.userMessage.userName)
+        this.props.history.push({
+          pathname:'/expiredList',
+ 
+        })
+      }else {
         message.warning(res.data.message);
       }
-    });
+    })
+  }
+
+  // 改变输入框值
+  inputChange = (label,val) => {
+    let data = this.state.userMessage
+    data[label] = val.target.value
+    this.setState({
+      userMessage:data,
+    })
   }
 
   render() {
     return (
       <div className="index">
-        <Spin tip="正在进入过期票管理系统" />
+        <div className="container">
+
+          <div className="title">
+            <img src={logo} alt="登录图标"/>
+            <p>过期票管理</p>
+          </div>
+
+          <div className="login_form">
+            <div className="login_form_box">
+              <Input 
+                placeholder="用户名"
+                value={this.state.userMessage.userName}
+                onChange={this.inputChange.bind(this,'userName')}
+                allowClear
+              />
+              <Input.Password
+                placeholder="密码" 
+                value={this.state.userMessage.password}
+                onChange={this.inputChange.bind(this,'password')}
+                allowClear
+              />
+            </div>
+            <div className="login_btn_box">
+              <Button onClick={() => this.getLogin()}>登录</Button>
+            </div>
+          </div>
+
+        </div>
       </div>
     )
   }
