@@ -3,4 +3,70 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: linear-gradient(to bottom right,rgba(0,123,255,.8),rgba(0,123,255,.2));
+  .container {
+    min-width: 400px;
+    min-height: 280px;
+    text-align: center;
+    .title {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+      font-size: 25px;
+      font-weight: 200;
+      color: #fff;
+      img {
+        width: 165px;
+        object-fit: contain;
+        margin-right: 5px;
+      }
+      p {
+        position: relative;
+        padding-left: 10px;
+        margin: 0;
+        &::after {
+          content: "";
+          position: absolute;
+          display: block;
+          left: 0;
+          top: 6px;
+          height: 75%;
+          background: hsla(0,0%,100%,.5803921568627451);
+          width: 2px;
+        }
+      }
+    }
+    .login_form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 30px 0px;
+      position: relative;
+      .login_form_box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        .ant-input-affix-wrapper {
+          width: 300px;
+          height: 40px;
+          border: 1px solid hsla(0,0%,100%,.4);
+          border-radius: 3px;
+          margin: 0 auto 10px auto;
+          
+        }
+      }
+      .login_btn_box {
+        .ant-btn {
+          width: 300px;
+          height: 40px;
+          font-size: 18px;
+          color: rgba(0,123,255,.8);
+          border-radius: 3px;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+      }
+    }
+  }
 }

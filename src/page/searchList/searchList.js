@@ -2,11 +2,11 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-21 17:36:11
+ * @LastEditTime: 2021-07-27 09:28:29
  * @LastEditors: wish.WuJunLong
  */
-import React, { Component } from 'react'
-import '../searchList/searchList.scss'
+import React, { Component } from "react";
+import "../searchList/searchList.scss";
 
 import {
   Table,
@@ -19,40 +19,36 @@ import {
   Button,
   Tooltip,
   Modal,
-  Upload
-} from 'antd';
+  Upload,
+} from "antd";
 
+import Header from "../../component/header/header"; // 头部横幅
 
 const { Column } = Table;
 const { Option } = Select;
-
 export default class searchList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
       searchData: {
-        query_type: 2,                //类型：Number  必有字段  备注：查询类型 1:出票日期 2:起飞日期 3:实退时间 4:结算时间 5:导入时间 6:扫描时间
-        begin_date: "2021-01-01T00:00:00",                //类型：String  必有字段  备注：开始日期
-        end_date: "2021-06-01T23:59:59",                //类型：String  必有字段  备注：结束日期
-        intl_flag: false,                //类型：Boolean  必有字段  备注：国际标识 true:国际 false:国内
-        airline_code: "",                //类型：String  必有字段  备注：航司二字码
-        yatp_order_no: "",                //类型：String  必有字段  备注：YATP订单号
-        pnr_code: "",                //类型：String  必有字段  备注：PNR
-        ticket_no: "",                //类型：String  必有字段  备注：票号
-        usage_status: "",                //类型：String  必有字段  备注：使用状态
-        passengers_name: "",                //类型：String  必有字段  备注：乘机人
-        scaner_topic: ""                //类型：String  必有字段  备注：扫描系统
+        query_type: 2, //类型：Number  必有字段  备注：查询类型 1:出票日期 2:起飞日期 3:实退时间 4:结算时间 5:导入时间 6:扫描时间
+        begin_date: "2021-01-01T00:00:00", //类型：String  必有字段  备注：开始日期
+        end_date: "2021-06-01T23:59:59", //类型：String  必有字段  备注：结束日期
+        intl_flag: false, //类型：Boolean  必有字段  备注：国际标识 true:国际 false:国内
+        airline_code: "", //类型：String  必有字段  备注：航司二字码
+        yatp_order_no: "", //类型：String  必有字段  备注：YATP订单号
+        pnr_code: "", //类型：String  必有字段  备注：PNR
+        ticket_no: "", //类型：String  必有字段  备注：票号
+        usage_status: "", //类型：String  必有字段  备注：使用状态
+        passengers_name: "", //类型：String  必有字段  备注：乘机人
+        scaner_topic: "", //类型：String  必有字段  备注：扫描系统
       },
 
       paginationData: {
-
         pageNo: 1, // 当前页
         pageCount: 10, // 页数
         pageTotal: 0, // 总页数
       },
-
-
 
       listData: [], // 列表数据
       applyData: [], // 使用状态
@@ -60,12 +56,11 @@ export default class searchList extends Component {
       subjectData: [], // 资金科目
       recentData: {}, // 近期审核
 
-
       tableLoading: true, // 表格加载
 
       // 上传文件
       fileList: [],
-      uploading: false, 
+      uploading: false,
 
       showModal: false, //  弹窗展示
       modalData: {
@@ -73,152 +68,136 @@ export default class searchList extends Component {
         purchase_actual_refund_price: "",
         purchase_refund_price: "",
         purchase_actual_refund_subject: "",
-        settlement_status: ""
+        settlement_status: "",
       }, // 弹窗数据
-
     };
   }
 
   async componentDidMount() {
-
-    await this.getSearchList();   // 列表数据
-    await this.getApplyStatus();  // 使用状态
-    await this.getScannerData();  // 扫描系统
+    await this.getSearchList(); // 列表数据
+    await this.getApplyStatus(); // 使用状态
+    await this.getScannerData(); // 扫描系统
     await this.getRecentSettle(); // 近期审核
   }
 
   // 查询列表
-  getSearchList (){
+  getSearchList() {
     let data = {
-      page_no: this.state.paginationData.pageNo,                //类型：Number  必有字段  备注：页码
-      page_size: this.state.paginationData.pageCount,               //类型：Number  必有字段  备注：每页显示条数
-      condition: this.state.searchData
-    }
+      page_no: this.state.paginationData.pageNo, //类型：Number  必有字段  备注：页码
+      page_size: this.state.paginationData.pageCount, //类型：Number  必有字段  备注：每页显示条数
+      condition: this.state.searchData,
+    };
     this.$axios.post("api/overdueticket/getpage", data).then((res) => {
       if (res.data.status === 0) {
-
         // 表格分页
-        let newPageData = this.state.paginationData
-        newPageData.pageNo = res.data.page_no
-        newPageData.pageTotal = res.data.total_count
+        let newPageData = this.state.paginationData;
+        newPageData.pageNo = res.data.page_no;
+        newPageData.pageTotal = res.data.total_count;
 
         this.setState({
-
           tableLoading: false,
           listData: res.data.datas,
-          paginationData: newPageData
-
-        })
-
+          paginationData: newPageData,
+        });
       } else {
-
-        message.error(res.data.message)
+        message.error(res.data.message);
       }
-
-    })
+    });
   }
 
   // 分页
   changePage = (page, pageSize) => {
-    console.log(page,pageSize)
+    console.log(page, pageSize);
     let data = this.state.paginationData;
     data["pageNo"] = page;
     data["pageCount"] = pageSize;
 
     this.setState({
-      paginationData: data
-    })
-    this.getSearchList()
-  }
+      paginationData: data,
+    });
+    this.getSearchList();
+  };
 
   // 获取使用状态
   getApplyStatus() {
     this.$axios.get("api/common/GetDataMappings?src=UsageStatus").then((res) => {
       if (res.data.status === 0) {
-
         this.setState({
-          applyData: res.data.data
-
-        })
+          applyData: res.data.data,
+        });
       }
-    })
+    });
   }
 
   // 获取扫描系统
   getScannerData() {
     this.$axios.get("api/common/GetDataMappings?src=ScanerTopic").then((res) => {
       if (res.data.status === 0) {
-
         this.setState({
-          scannerData: res.data.data
-        })
+          scannerData: res.data.data,
+        });
       }
-    })
+    });
   }
 
   // 获取近期审核
   getRecentSettle() {
     this.$axios.get("api/OverdueTicket/GetSettlementResult").then((res) => {
       if (res.data.status === 0) {
-
         this.setState({
-          recentData: res.data.data
-        })
-        console.log(this.state.recentData)
+          recentData: res.data.data,
+        });
+        console.log(this.state.recentData);
       }
-    })
+    });
   }
 
   // 获取资金科目
   getSalarySubject() {
     this.$axios.get("api/common/getCapitalSubjects").then((res) => {
-
       if (res.data.status === 0) {
-
         this.setState({
-          subjectData: res.data.data
-        })
-        console.log(this.state.subjectData)
+          subjectData: res.data.data,
+        });
+        console.log(this.state.subjectData);
       }
-    })
+    });
   }
 
   // 搜索
   searchData = () => {
-    this.getSearchList()
-  }
-
+    this.getSearchList();
+  };
 
   // 文件上传
   fileUpload = () => {
     const { fileList } = this.state;
     const formData = new FormData();
-    fileList.forEach(file => {
-      formData.append('files[]', file);
+    fileList.forEach((file) => {
+      formData.append("files[]", file);
     });
 
     this.setState({
       uploading: true,
     });
 
-    this.$axios.post('api/OverdueTicket/SettlementByFile', formData, { processData: false })
-      .then(res => {
+    this.$axios
+      .post("api/OverdueTicket/SettlementByFile", formData, { processData: false })
+      .then((res) => {
         this.setState({
           uploading: false,
-        })
+        });
         if (res.data.status === 0) {
           this.setState({
-            fileList: []
-          })
+            fileList: [],
+          });
           this.getRecentSettle(); // 近期审核
-          message.success(res.data.message)
+          message.success(res.data.message);
         } else {
-          message.warning(res.data.message)
+          message.warning(res.data.message);
         }
-      })
-
-
-  }
+      });
+  };
 
   // 删除文件
   removeFileBtn = (e) => {
@@ -226,134 +205,165 @@ export default class searchList extends Component {
     this.setState({
       fileList: [],
     });
-  }
+  };
 
   // 文件下载
   fileLoad = () => {
-    this.$axios.get("api/OverdueTicket/DownloadResult", { responseType: 'arraybuffer', }).then((res) => {
-      if (res.status === 200) {
-        const data = res.data
-        const url = window.URL.createObjectURL(new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }))
-        const link = document.createElement('a')
-        link.style.display = 'none'
-        link.href = url
-        link.setAttribute('download', this.state.recentData.file_name)
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+    this.$axios
+      .get("api/OverdueTicket/DownloadResult", { responseType: "arraybuffer" })
+      .then((res) => {
+        if (res.status === 200) {
+          const data = res.data;
+          const url = window.URL.createObjectURL(
+            new Blob([data], {
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            })
+          );
+          const link = document.createElement("a");
+          link.style.display = "none";
+          link.href = url;
+          link.setAttribute("download", this.state.recentData.file_name);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          message.error(res.statusText);
+        }
+      });
+  };
 
-      } else {
-        message.error(res.statusText)
-      }
-    })
-  }
+  // 报表下载
+  reportLoad = () => {
+    this.$axios
+      .post("api/OverdueTicket/DownloadReport", this.state.searchData, {
+        responseType: "arraybuffer",
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          const data = res.data;
+          const url = window.URL.createObjectURL(
+            new Blob([data], {
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            })
+          );
+          const link = document.createElement("a");
+          link.style.display = "none";
+          link.href = url;
+          link.setAttribute("download", `报表${this.$moment().format("X")}.xls`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          message.error(res.statusText);
+        }
+      });
+  };
 
   // 选择器
   changeSelect = (label, val) => {
-    console.log(label, val)
+    console.log(label, val);
 
-    let data = this.state.searchData
-    data[label] = val
+    let data = this.state.searchData;
+    data[label] = val;
     this.setState({
-      searchData: data
-    })
-  }
+      searchData: data,
+    });
+  };
 
   // 输入框,单选框
   changeInput = (label, val) => {
-    console.log(label, val.target.value)
+    console.log(label, val.target.value);
 
-    let data = this.state.searchData
-    data[label] = val.target.value
+    let data = this.state.searchData;
+    data[label] = val.target.value;
     this.setState({
-      searchData: data
-    })
-  }
+      searchData: data,
+    });
+  };
 
   // 日期选择
   changeDate = (label, date, dateString) => {
-    console.log(label, dateString)
+    console.log(label, dateString);
 
-    let data = this.state.searchData
-    data[label] = dateString
+    let data = this.state.searchData;
+    data[label] = dateString;
     this.setState({
-      searchData: data
-    })
-  }
+      searchData: data,
+    });
+  };
 
   // 对话框弹出
   openModal = (val) => {
-    console.log('行', val)
+    console.log("行", val);
     this.setState({
       modalData: val,
-      showModal: true
-    })
+      showModal: true,
+    });
     this.getSalarySubject(); // 资金科目
-  }
+  };
 
   // 对话框关闭
   closeModal = () => {
     this.setState({
-      showModal: false
-    })
-  }
+      showModal: false,
+    });
+  };
 
   // 结算审核
   getSettlement = () => {
-
     let data = {
-      key_id: this.state.modalData.key_id,                //类型：Number  必有字段  备注：表id
-      purchase_refund_price: Number(this.state.modalData.purchase_refund_price),                //类型：Number  必有字段  备注：采购应退金额
-      purchase_actual_refund_price: Number(this.state.modalData.purchase_actual_refund_price),                //类型：Number  必有字段  备注：采购实退金额
-      purchase_actual_refund_subject: this.state.modalData.purchase_actual_refund_subject,                //类型：String  必有字段  备注：采购实退科目
-      purchase_actual_refund_time: this.state.modalData.purchase_actual_refund_time,                //类型：String  必有字段  备注：采购实退时间
-      settlement_status: Number(this.state.modalData.settlement_status)             //类型：Number  必有字段  备注：结算状态 0-未结算 1-已结算
-    }
+      key_id: this.state.modalData.key_id, //类型：Number  必有字段  备注：表id
+      purchase_refund_price: Number(this.state.modalData.purchase_refund_price), //类型：Number  必有字段  备注：采购应退金额
+      purchase_actual_refund_price: Number(
+        this.state.modalData.purchase_actual_refund_price
+      ), //类型：Number  必有字段  备注：采购实退金额
+      purchase_actual_refund_subject: this.state.modalData.purchase_actual_refund_subject, //类型：String  必有字段  备注：采购实退科目
+      purchase_actual_refund_time: this.state.modalData.purchase_actual_refund_time, //类型：String  必有字段  备注：采购实退时间
+      settlement_status: Number(this.state.modalData.settlement_status), //类型：Number  必有字段  备注：结算状态 0-未结算 1-已结算
+    };
 
     this.$axios.post("api/overdueticket/settlement", data).then((res) => {
-
       if (res.data.status === 0) {
         this.setState({
-          showModal: false
-        })
-        message.info(res.data.message)
-
+          showModal: false,
+        });
+        message.info(res.data.message);
       } else {
-        message.error(res.data.message)
+        message.error(res.data.message);
       }
-    })
-  }
+    });
+  };
 
   // 弹出框 选择器
   changeSelectModal = (label, e) => {
-    console.log(label, e)
+    console.log(label, e);
 
-    let data = this.state.modalData
-    data[label] = e
+    let data = this.state.modalData;
+    data[label] = e;
     this.setState({
-      modalData: data
-    })
-  }
+      modalData: data,
+    });
+  };
 
   // 弹出框 输入框
   changeInputModal = (label, e) => {
-    let data = this.state.modalData
-    data[label] = e.target.value
+    let data = this.state.modalData;
+    data[label] = e.target.value;
     this.setState({
-      modalData: data
-    })
-  }
+      modalData: data,
+    });
+  };
 
   // 弹出框 日期
   changeDateModal = (label, date, dateString) => {
-    console.log(label, dateString)
+    console.log(label, dateString);
 
-    let data = this.state.modalData
-    data[label] = dateString
+    let data = this.state.modalData;
+    data[label] = dateString;
     this.setState({
-      modalData: data
-    })
-  }
+      modalData: data,
+    });
+  };
 
   render() {
     const { fileList } = this.state;
@@ -370,8 +380,8 @@ export default class searchList extends Component {
     // }
     // 手动上传
     const props = {
-      onRemove: file => {
-        this.setState(state => {
+      onRemove: (file) => {
+        this.setState((state) => {
           const index = state.fileList.indexOf(file);
           const newFileList = state.fileList.slice();
           newFileList.splice(index, 1);
@@ -380,9 +390,9 @@ export default class searchList extends Component {
           };
         });
       },
-      beforeUpload: file => {
-        console.log(file)
-        this.setState(state => ({
+      beforeUpload: (file) => {
+        console.log(file);
+        this.setState((state) => ({
           fileList: [...state.fileList, file],
         }));
         return false;
@@ -390,21 +400,18 @@ export default class searchList extends Component {
       fileList,
     };
 
-
-
     return (
       <div className="searchList">
+        <Header history={this.props.history}></Header>
         <div className="search_content">
-
           {/* 筛选条件 */}
           <div className="search_condition">
-
             <div className="condition_div">
               <div className="div_title">订单类型</div>
               <div className="div_input">
                 <Radio.Group
                   value={this.state.searchData.intl_flag}
-                  onChange={this.changeInput.bind(this, 'intl_flag')}
+                  onChange={this.changeInput.bind(this, "intl_flag")}
                 >
                   <Radio value={true}>国际</Radio>
                   <Radio value={false}>国内</Radio>
@@ -419,7 +426,7 @@ export default class searchList extends Component {
                   placeholder="请输入"
                   style={{ width: 200 }}
                   allowClear
-                  onChange={this.changeInput.bind(this, 'ticket_no')}
+                  onChange={this.changeInput.bind(this, "ticket_no")}
                 />
               </div>
             </div>
@@ -431,7 +438,7 @@ export default class searchList extends Component {
                   placeholder="请输入"
                   style={{ width: 200 }}
                   allowClear
-                  onChange={this.changeInput.bind(this, 'airline_code')}
+                  onChange={this.changeInput.bind(this, "airline_code")}
                 />
               </div>
             </div>
@@ -443,7 +450,7 @@ export default class searchList extends Component {
                   placeholder="请输入"
                   style={{ width: 200 }}
                   allowClear
-                  onChange={this.changeInput.bind(this, 'yatp_order_no')}
+                  onChange={this.changeInput.bind(this, "yatp_order_no")}
                 />
               </div>
             </div>
@@ -455,7 +462,7 @@ export default class searchList extends Component {
                   placeholder="请输入"
                   style={{ width: 200 }}
                   allowClear
-                  onChange={this.changeInput.bind(this, 'pnr_code')}
+                  onChange={this.changeInput.bind(this, "pnr_code")}
                 />
               </div>
             </div>
@@ -467,7 +474,7 @@ export default class searchList extends Component {
                   placeholder="请输入"
                   style={{ width: 200 }}
                   allowClear
-                  onChange={this.changeInput.bind(this, 'passengers_name')}
+                  onChange={this.changeInput.bind(this, "passengers_name")}
                 />
               </div>
             </div>
@@ -480,7 +487,7 @@ export default class searchList extends Component {
                   style={{ width: 200 }}
                   allowClear
                   placeholder="请选择"
-                  onChange={this.changeSelect.bind(this, 'query_type')}
+                  onChange={this.changeSelect.bind(this, "query_type")}
                 >
                   <Option value={1}>出票日期</Option>
                   <Option value={2}>起飞日期</Option>
@@ -497,12 +504,12 @@ export default class searchList extends Component {
               <div className="div_input">
                 <DatePicker
                   value={this.$moment(this.state.searchData.begin_date)}
-                  onChange={this.changeDate.bind(this, 'begin_date')}
+                  onChange={this.changeDate.bind(this, "begin_date")}
                 />
                 -
                 <DatePicker
                   value={this.$moment(this.state.searchData.end_date)}
-                  onChange={this.changeDate.bind(this, 'end_date')}
+                  onChange={this.changeDate.bind(this, "end_date")}
                 />
               </div>
             </div>
@@ -515,7 +522,7 @@ export default class searchList extends Component {
                   style={{ width: 200 }}
                   allowClear
                   value={this.state.searchData.usage_status}
-                  onChange={this.changeSelect.bind(this, 'usage_status')}
+                  onChange={this.changeSelect.bind(this, "usage_status")}
                 >
                   {this.state.applyData.map((item) => (
                     <Option value={item.data_code} key={item.key_id}>
@@ -534,7 +541,7 @@ export default class searchList extends Component {
                   style={{ width: 200 }}
                   allowClear
                   value={this.state.searchData.scaner_topic}
-                  onChange={this.changeSelect.bind(this, 'scaner_topic')}
+                  onChange={this.changeSelect.bind(this, "scaner_topic")}
                 >
                   {this.state.scannerData.map((item) => (
                     <Option value={item.data_code} key={item.key_id}>
@@ -545,44 +552,77 @@ export default class searchList extends Component {
               </div>
             </div>
 
+            {/* 表格操作 */}
             <div className="search_action">
+              <div className="action_position">
+                <Button type="primary" onClick={this.searchData}>
+                  查询
+                </Button>
+              </div>
 
-              <div className="action_position"><Button type="primary" onClick={this.searchData}>查询</Button></div>
-              
               {this.state.recentData ? (
-
                 <div className="action_position">
-                  <Tooltip placement="bottom" title={() => this.state.recentData ? (<>
-
-                    <div>{this.state.recentData.file_name}</div>
-                    <div>{this.$moment(this.state.recentData.create_time).format('YYYY-MM-DD HH:mm:ss')}</div>
-
-                  </>) : ''}>
-
-                    <Button type="primary" onClick={this.fileLoad}>下载结算审核结果</Button>
+                  <Tooltip
+                    placement="bottom"
+                    title={() =>
+                      this.state.recentData ? (
+                        <>
+                          <div>{this.state.recentData.file_name}</div>
+                          <div>
+                            {this.$moment(this.state.recentData.create_time).format(
+                              "YYYY-MM-DD HH:mm:ss"
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        ""
+                      )
+                    }
+                  >
+                    <Button type="primary" onClick={this.fileLoad}>
+                      下载结算审核结果
+                    </Button>
                   </Tooltip>
                 </div>
-              ) : ""}
-
+              ) : (
+                ""
+              )}
 
               <div className="action_position action_upload">
-                {
-                  this.state.fileList.length > 0 ? (
-                    <Button type="primary" loading={this.state.uploading} onClick={this.fileUpload}>确认上传</Button>
-                  ) : ""
-                }
+                {this.state.fileList.length > 0 ? (
+                  <Button
+                    type="primary"
+                    loading={this.state.uploading}
+                    onClick={this.fileUpload}
+                  >
+                    确认上传
+                  </Button>
+                ) : (
+                  ""
+                )}
                 <Upload {...props}>
-                {
-                  this.state.fileList.length > 0 ?
-                    (<span style={{ marginLeft: 10 }}>{this.state.fileList[0].name} <span onClick={this.removeFileBtn} style={{ color: 'red', fontSize: 12, cursor: 'pointer' }}>删除</span></span>)
-                    : (<Button type="primary">上传结算数据</Button>)
-                }
-
+                  {this.state.fileList.length > 0 ? (
+                    <span style={{ marginLeft: 10 }}>
+                      {this.state.fileList[0].name}{" "}
+                      <span
+                        onClick={this.removeFileBtn}
+                        style={{ color: "red", fontSize: 12, cursor: "pointer" }}
+                      >
+                        删除
+                      </span>
+                    </span>
+                  ) : (
+                    <Button type="primary">上传结算数据</Button>
+                  )}
                 </Upload>
               </div>
 
+              <div className="action_position">
+                <Button type="primary" onClick={this.reportLoad}>
+                  报表下载
+                </Button>
+              </div>
             </div>
-
           </div>
 
           {/* 列表操作 */}
@@ -601,7 +641,6 @@ export default class searchList extends Component {
               dataSource={this.state.listData}
               loading={this.state.tableLoading}
             >
-
               {/* <Column
                 title="编号"
                 width={100}
@@ -614,7 +653,9 @@ export default class searchList extends Component {
                 render={(text, render) => (
                   <>
                     <div className="table_action">
-                      <Button type="primary" onClick={() => this.openModal(render)}>审核</Button>
+                      <Button type="primary" onClick={() => this.openModal(render)}>
+                        审核
+                      </Button>
                     </div>
                   </>
                 )}
@@ -625,129 +666,96 @@ export default class searchList extends Component {
                 dataIndex="intl_flag"
                 render={(text) => <>{text ? "国际" : "国内"}</>}
               />
-              <Column
-                title="票证类型"
-                width={75}
-                dataIndex="ticket_type"
-              />
-              <Column
-                title="票号"
-                width={120}
-                dataIndex="ticket_no"
-              />
+              <Column title="票证类型" width={75} dataIndex="ticket_type" />
+              <Column title="票号" width={120} dataIndex="ticket_no" />
               <Column
                 title="出票时间"
                 width={150}
                 dataIndex="issue_time"
                 render={(text) => <>{this.$moment(text).format("YYYY-MM-DD HH:mm:ss")}</>}
               />
-              <Column
-                title="航司二字码"
-                width={80}
-                dataIndex="airline_code"
-              />
-              <Column
-                title="YATP订单号"
-                width={90}
-                dataIndex="yatp_order_no"
-              />
+              <Column title="航司二字码" width={80} dataIndex="airline_code" />
+              <Column title="YATP订单号" width={90} dataIndex="yatp_order_no" />
               <Column
                 title="PNR"
                 width={65}
                 dataIndex="pnr_code"
                 render={(text) => (
                   <>
-                    <Tooltip title={() => (
-                      <>
-                        <p style={{ fontSize: "14px", marginBottom: "5px" }}>
-                          PNR状态
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            color: "#fff",
-                            minWidth: "90px",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          {text}
-                        </p>
-                      </>
-                    )}>{text}
+                    <Tooltip
+                      title={() => (
+                        <>
+                          <p style={{ fontSize: "14px", marginBottom: "5px" }}>PNR状态</p>
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: "#fff",
+                              minWidth: "90px",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {text}
+                          </p>
+                        </>
+                      )}
+                    >
+                      {text}
+                    </Tooltip>
+                  </>
+                )}
+              />
+              <Column title="乘机人" width={75} dataIndex="passengers_name" />
+              <Column title="乘机人类型" width={80} dataIndex="passengers_type" />
+              <Column title="行程" width={80} dataIndex="trip_code" />
+              <Column title="航班号" width={80} dataIndex="flight_no" />
+              <Column
+                title="使用状态"
+                width={80}
+                dataIndex="usage_status"
+                render={(text) => (
+                  <>
+                    <Tooltip
+                      title={() => (
+                        <>
+                          <p style={{ fontSize: "14px", marginBottom: "5px" }}>
+                            使用状态
+                          </p>
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: "#fff",
+                              minWidth: "90px",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {text}
+                          </p>
+                        </>
+                      )}
+                    >
+                      <div
+                        style={{
+                          color:
+                            text.indexOf("全部") !== -1
+                              ? "#5AB957"
+                              : text.indexOf("部分") !== -1
+                              ? "#0070E2"
+                              : "",
+                        }}
+                      >
+                        {text}
+                      </div>
                     </Tooltip>
                   </>
                 )}
               />
               <Column
-                title="乘机人"
-                width={75}
-                dataIndex="passengers_name"
-              />
-              <Column
-                title="乘机人类型"
-                width={80}
-                dataIndex="passengers_type"
-              />
-              <Column
-                title="行程"
-                width={80}
-                dataIndex="trip_code"
-              />
-              <Column
-                title="航班号"
-                width={80}
-                dataIndex="flight_no"
-              />
-              <Column
-                title="使用状态"
-                width={80}
-                dataIndex="usage_status"
-                render={(text) =>
-                  <>
-                    <Tooltip title={() => (
-                      <>
-                        <p style={{ fontSize: "14px", marginBottom: "5px" }}>
-                          使用状态
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            color: "#fff",
-                            minWidth: "90px",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          {text}
-                        </p>
-                      </>
-                    )}>
-
-                      <div style={{
-                        color:
-                          text.indexOf("全部") !== -1
-                            ? "#5AB957"
-                            : text.indexOf("部分") !== -1
-                              ? "#0070E2"
-                              : ""
-                      }}>
-
-                        {text}
-                      </div>
-                    </Tooltip>
-                  </>
-                }
-              />
-              <Column
                 title="实退科目"
                 width={120}
                 dataIndex="purchase_actual_refund_subject"
-                render={(text) => (<>{text || "--"}</>)}
+                render={(text) => <>{text || "--"}</>}
               />
-              <Column
-                title="应退金额"
-                width={50}
-                dataIndex="purchase_refund_price"
-              />
+              <Column title="应退金额" width={50} dataIndex="purchase_refund_price" />
               <Column
                 title="实退金额"
                 width={50}
@@ -763,44 +771,37 @@ export default class searchList extends Component {
                 title="结算状态"
                 width={75}
                 dataIndex="settlement_status"
-                render={(text) =>
+                render={(text) => (
                   <>
-                    <Tooltip title={() => (
-                      <>
-                        <p style={{ fontSize: "14px", marginBottom: "5px" }}>
-                          结算状态
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            color: "#fff",
-                            minWidth: "90px",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          {text === 0 ? "未结算" :
-                            text === 1 ? "已结算" : ''
-                          }
-                        </p>
-                      </>
-                    )}>
-
-                      <div style={{
-                        color:
-                          text === 0
-                            ? "#FF0000"
-                            : text === 1
-                              ? "#5AB957"
-                              : ""
-                      }}>
-
-                        {text === 0 ? "未结算" :
-                          text === 1 ? "已结算" : ''
-                        }
+                    <Tooltip
+                      title={() => (
+                        <>
+                          <p style={{ fontSize: "14px", marginBottom: "5px" }}>
+                            结算状态
+                          </p>
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: "#fff",
+                              minWidth: "90px",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {text === 0 ? "未结算" : text === 1 ? "已结算" : ""}
+                          </p>
+                        </>
+                      )}
+                    >
+                      <div
+                        style={{
+                          color: text === 0 ? "#FF0000" : text === 1 ? "#5AB957" : "",
+                        }}
+                      >
+                        {text === 0 ? "未结算" : text === 1 ? "已结算" : ""}
                       </div>
                     </Tooltip>
                   </>
-                }
+                )}
               />
               <Column
                 title="结算时间"
@@ -820,11 +821,7 @@ export default class searchList extends Component {
                 dataIndex="create_time"
                 render={(text) => <>{this.$moment(text).format("YYYY-MM-DD HH:mm:ss")}</>}
               />
-              <Column
-                title="扫描系统"
-                width={75}
-                dataIndex="scaner_topic"
-              />
+              <Column title="扫描系统" width={75} dataIndex="scaner_topic" />
               <Column
                 title="扫描时间"
                 dataIndex="scan_time"
@@ -842,7 +839,6 @@ export default class searchList extends Component {
                 onChange={this.changePage}
               />
             </div>
-
           </div>
 
           {/* 结算审核 */}
@@ -856,7 +852,6 @@ export default class searchList extends Component {
             onOk={() => this.getSettlement()}
           >
             <div className="settle_modal">
-
               <div className="modal_item">
                 <div className="modal_title">结算状态</div>
                 <div className="modal_input">
@@ -865,11 +860,10 @@ export default class searchList extends Component {
                     style={{ width: 120 }}
                     allowClear
                     value={this.state.modalData.settlement_status}
-                    onChange={this.changeSelectModal.bind(this, 'settlement_status')}
+                    onChange={this.changeSelectModal.bind(this, "settlement_status")}
                   >
                     <Option value={0}>未结算</Option>
                     <Option value={1}>已结算</Option>
-
                   </Select>
                 </div>
               </div>
@@ -883,7 +877,10 @@ export default class searchList extends Component {
                     allowClear
                     showSearch
                     value={this.state.modalData.purchase_actual_refund_subject}
-                    onChange={this.changeSelectModal.bind(this, 'purchase_actual_refund_subject')}
+                    onChange={this.changeSelectModal.bind(
+                      this,
+                      "purchase_actual_refund_subject"
+                    )}
                   >
                     {this.state.subjectData.map((item) => (
                       <Option value={item.name} key={item.payMentId}>
@@ -902,7 +899,7 @@ export default class searchList extends Component {
                     style={{ width: 120 }}
                     allowClear
                     value={this.state.modalData.purchase_refund_price}
-                    onChange={this.changeInputModal.bind(this, 'purchase_refund_price')}
+                    onChange={this.changeInputModal.bind(this, "purchase_refund_price")}
                   />
                 </div>
               </div>
@@ -915,7 +912,10 @@ export default class searchList extends Component {
                     style={{ width: 120 }}
                     allowClear
                     value={this.state.modalData.purchase_actual_refund_price}
-                    onChange={this.changeInputModal.bind(this, 'purchase_actual_refund_price')}
+                    onChange={this.changeInputModal.bind(
+                      this,
+                      "purchase_actual_refund_price"
+                    )}
                   />
                 </div>
               </div>
@@ -926,17 +926,17 @@ export default class searchList extends Component {
                   <DatePicker
                     style={{ width: 120 }}
                     value={this.$moment(this.state.modalData.purchase_actual_refund_time)}
-                    onChange={this.changeDateModal.bind(this, 'purchase_actual_refund_time')}
+                    onChange={this.changeDateModal.bind(
+                      this,
+                      "purchase_actual_refund_time"
+                    )}
                   />
                 </div>
               </div>
-
             </div>
           </Modal>
         </div>
-      </div >
-    )
+      </div>
+    );
   }
 }
-
-

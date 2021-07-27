@@ -1,0 +1,18 @@
+.search_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1890ff;
+  padding: 5px 30px;
+  img {
+    width: 160px;
+    object-fit: contain;
+  }
+  .header_down {
+    .down_title {
+      cursor: pointer;
+      color: #fff;
+      font-size: 17px;
+    }
+  }
+}

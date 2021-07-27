@@ -19,3 +19,13 @@ body {
     }
   }
 }
+
+// 下拉菜单
+.ant-dropdown-trigger > 
+.anticon.anticon-down, 
+.ant-dropdown-link > 
+.anticon.anticon-down, 
+.ant-dropdown-button > 
+.anticon.anticon-down {
+  margin-left: 5px;
+}

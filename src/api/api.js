@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: mzr
  * @Date: 2021-07-08 14:01:46
- * @LastEditTime: 2021-07-21 11:53:59
+ * @LastEditTime: 2021-07-27 09:31:16
  * @LastEditors: wish.WuJunLong
  */
 import axios from "axios";
@@ -19,7 +19,7 @@ let baseUrl = "http://192.168.0.212:6991";
 
 axios.defaults.baseURL = baseUrl;
 
-let instance = axios.create({
+let instance = axios.create({ 
   timeout: 1000 * 12,
 });
 
