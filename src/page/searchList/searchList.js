@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-27 10:50:59
+ * @LastEditTime: 2021-07-27 16:13:34
  * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from "react";
@@ -160,6 +160,8 @@ export default class searchList extends Component {
           subjectData: res.data.data,
         });
         console.log(this.state.subjectData);
+      }else {
+        message.warning(res.data.message)
       }
     });
   }
@@ -286,7 +288,7 @@ export default class searchList extends Component {
     console.log(label, dateString);
 
     let data = this.state.searchData;
-    data[label] = this.$moment(dateString).format("YYYY-MM-DD");
+    data[label] = dateString ? this.$moment(dateString).format("YYYY-MM-DD") : null;
     this.setState({
       searchData: data,
     });
@@ -296,7 +298,7 @@ export default class searchList extends Component {
   openModal = (val) => {
     console.log("行", val);
     this.setState({
-      modalData: val,
+      modalData: JSON.parse(JSON.stringify(val)),
       showModal: true,
     });
     this.getSalarySubject(); // 资金科目
@@ -503,14 +505,24 @@ export default class searchList extends Component {
               <div className="div_title">时间范围</div>
               <div className="div_input">
                 <DatePicker
+                  allowClear={false}
                   showToday={false}
-                  value={this.$moment(this.state.searchData.begin_date)}
+                  value={
+                    this.state.searchData.begin_date
+                      ? this.$moment(this.state.searchData.begin_date)
+                      : null
+                  }
                   onChange={this.changeDate.bind(this, "begin_date")}
                 />
                 -
                 <DatePicker
+                  allowClear={false}
                   showToday={false}
-                  value={this.$moment(this.state.searchData.end_date)}
+                  value={
+                    this.state.searchData.end_date
+                      ? this.$moment(this.state.searchData.end_date)
+                      : null
+                  }
                   onChange={this.changeDate.bind(this, "end_date")}
                 />
               </div>

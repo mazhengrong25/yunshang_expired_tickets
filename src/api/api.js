@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: mzr
  * @Date: 2021-07-08 14:01:46
- * @LastEditTime: 2021-07-27 09:34:51
+ * @LastEditTime: 2021-07-27 16:10:29
  * @LastEditors: wish.WuJunLong
  */
 import axios from "axios";
@@ -35,7 +35,7 @@ instance.interceptors.request.use(
     return config;
   },
   (error) => {
-    return Promise.reject(error);
+    return Promise.reject(error); 
   }
 );
 
@@ -51,7 +51,6 @@ instance.interceptors.response.use(
     } else {
       message.destroy();
       message.error(error.response ? error.response.data.msg : "请求失败，请联系管理员");
-      localStorage.removeItem("token");
     }
     return Promise.reject(error);
 
