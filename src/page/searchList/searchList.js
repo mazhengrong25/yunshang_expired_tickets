@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-27 09:28:29
+ * @LastEditTime: 2021-07-27 10:25:06
  * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from "react";
@@ -32,8 +32,8 @@ export default class searchList extends Component {
     this.state = {
       searchData: {
         query_type: 2, //类型：Number  必有字段  备注：查询类型 1:出票日期 2:起飞日期 3:实退时间 4:结算时间 5:导入时间 6:扫描时间
-        begin_date: "2021-01-01T00:00:00", //类型：String  必有字段  备注：开始日期
-        end_date: "2021-06-01T23:59:59", //类型：String  必有字段  备注：结束日期
+        begin_date: this.$moment().subtract(6, "months").format("YYYY-MM-DD"), //类型：String  必有字段  备注：开始日期
+        end_date: this.$moment().format("YYYY-MM-DD"), //类型：String  必有字段  备注：结束日期
         intl_flag: false, //类型：Boolean  必有字段  备注：国际标识 true:国际 false:国内
         airline_code: "", //类型：String  必有字段  备注：航司二字码
         yatp_order_no: "", //类型：String  必有字段  备注：YATP订单号
@@ -286,7 +286,7 @@ export default class searchList extends Component {
     console.log(label, dateString);
 
     let data = this.state.searchData;
-    data[label] = dateString;
+    data[label] = this.$moment(dateString).format("YYYY-MM-DD");
     this.setState({
       searchData: data,
     });
@@ -503,11 +503,13 @@ export default class searchList extends Component {
               <div className="div_title">时间范围</div>
               <div className="div_input">
                 <DatePicker
+                  showToday={false}
                   value={this.$moment(this.state.searchData.begin_date)}
                   onChange={this.changeDate.bind(this, "begin_date")}
                 />
                 -
                 <DatePicker
+                  showToday={false}
                   value={this.$moment(this.state.searchData.end_date)}
                   onChange={this.changeDate.bind(this, "end_date")}
                 />
@@ -833,9 +835,11 @@ export default class searchList extends Component {
             {/* 分页 */}
             <div className="search_list_page">
               <Pagination
+                showSizeChanger
                 current={this.state.paginationData.pageNo}
                 pageSize={this.state.paginationData.pageCount}
                 total={this.state.paginationData.pageTotal}
+                pageSizeOptions={[10, 30, 50, 100, 500]}
                 onChange={this.changePage}
               />
             </div>
