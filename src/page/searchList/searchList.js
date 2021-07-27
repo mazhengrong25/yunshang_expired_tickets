@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-27 10:25:06
+ * @LastEditTime: 2021-07-27 10:50:59
  * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from "react";
@@ -39,9 +39,9 @@ export default class searchList extends Component {
         yatp_order_no: "", //类型：String  必有字段  备注：YATP订单号
         pnr_code: "", //类型：String  必有字段  备注：PNR
         ticket_no: "", //类型：String  必有字段  备注：票号
-        usage_status: "", //类型：String  必有字段  备注：使用状态
+        usage_status: null, //类型：String  必有字段  备注：使用状态
         passengers_name: "", //类型：String  必有字段  备注：乘机人
-        scaner_topic: "", //类型：String  必有字段  备注：扫描系统
+        scaner_topic: null, //类型：String  必有字段  备注：扫描系统
       },
 
       paginationData: {
@@ -835,6 +835,7 @@ export default class searchList extends Component {
             {/* 分页 */}
             <div className="search_list_page">
               <Pagination
+                showTotal={(total) => `共 ${total} 条`}
                 showSizeChanger
                 current={this.state.paginationData.pageNo}
                 pageSize={this.state.paginationData.pageCount}
