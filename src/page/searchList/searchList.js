@@ -2,8 +2,8 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-20 17:25:42
- * @LastEditors: mzr
+ * @LastEditTime: 2021-07-21 17:36:11
+ * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from 'react'
 import '../searchList/searchList.scss'
@@ -559,7 +559,7 @@ export default class searchList extends Component {
 
                   </>) : ''}>
 
-                    <Button type="primary" onClick={this.fileLoad}>文件下载</Button>
+                    <Button type="primary" onClick={this.fileLoad}>下载结算审核结果</Button>
                   </Tooltip>
                 </div>
               ) : ""}
@@ -575,7 +575,7 @@ export default class searchList extends Component {
                 {
                   this.state.fileList.length > 0 ?
                     (<span style={{ marginLeft: 10 }}>{this.state.fileList[0].name} <span onClick={this.removeFileBtn} style={{ color: 'red', fontSize: 12, cursor: 'pointer' }}>删除</span></span>)
-                    : (<Button type="primary">文件上传</Button>)
+                    : (<Button type="primary">上传结算数据</Button>)
                 }
 
                 </Upload>
