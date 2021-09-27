@@ -1,0 +1,60 @@
+.ticket_expire {
+  padding-bottom: 20px;
+  .ticket_expire_content {
+    background-color: #fff;
+    margin: 15px 30px;
+    padding: 20px;
+    .search_box {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      .box_list {
+        display: inline-flex;
+        align-items: center;
+        &:not(:last-child) {
+          margin-right: 20px;
+        }
+        .list_title {
+          font-size: 14px;
+          margin-right: 10px;
+        }
+        .list_input{
+          min-width: 180px;
+          .ant-select{
+            width: 100%;
+          }
+        }
+      }
+    }
+    .ticket_expire_table{
+      .ant-pagination{
+        margin-top: 20px;
+        text-align: right;
+      }
+    }
+  }
+
+
+  .ticket_modal{
+    display: flex;
+    flex-wrap: wrap;
+    .modal_list{
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 20px;
+      &:nth-child(odd){
+        margin-right: 20px;
+      }
+      .list_title{
+        width: 80px;
+      }
+      .list_input{
+        flex: 1;
+        min-width: 200px;
+        > *{
+          width: 100%;
+        }
+      }
+    }
+  }
+}

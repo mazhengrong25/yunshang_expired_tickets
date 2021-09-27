@@ -4,9 +4,42 @@
   justify-content: space-between;
   background-color: #1890ff;
   padding: 5px 30px;
-  img {
-    width: 160px;
-    object-fit: contain;
+  .menu_box{
+    display: inline-flex;
+    align-items: center;
+    img {
+      width: 160px;
+      object-fit: contain;
+    }
+    .menu_list{
+      display: inline-flex;
+      align-items: center;
+      margin-left: 50px;
+      .list_btn{
+        padding: 0 20px;
+        height: 58px;
+        line-height: 58px;
+        font-size: 15px;
+        color: #fff;
+        position: relative;
+        cursor: pointer;
+        &.active{
+          
+          &::after{
+            content: '';
+            background: #fff;
+            height: 3px;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            position: absolute;
+          }
+        }
+        &:not(:last-child){
+          margin-right: 20px;
+        }
+      }
+    }
   }
   .header_down {
     .down_title {

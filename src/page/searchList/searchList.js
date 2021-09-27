@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-07-27 16:13:34
+ * @LastEditTime: 2021-08-19 15:24:00
  * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from "react";
@@ -70,14 +70,20 @@ export default class searchList extends Component {
         purchase_actual_refund_subject: "",
         settlement_status: "",
       }, // 弹窗数据
+
+      // scanerTopicList: [], // 扫描系统列表
+
+      orderTypeList: [], // 订单类型
     };
   }
 
   async componentDidMount() {
     await this.getSearchList(); // 列表数据
     await this.getApplyStatus(); // 使用状态
+    await this.getOrderType(); // 获取订单类型
     await this.getScannerData(); // 扫描系统
     await this.getRecentSettle(); // 近期审核
+    // await this.getScanerTopics()
   }
 
   // 查询列表
@@ -129,6 +135,17 @@ export default class searchList extends Component {
     });
   }
 
+  // 订单类型
+  getOrderType() {
+    this.$axios.get("api/common/GetDataMappings?src=OrderType").then((res) => {
+      if (res.data.status === 0) {
+        this.setState({
+          orderTypeList: res.data.data,
+        });
+      }
+    });
+  }
+
   // 获取扫描系统
   getScannerData() {
     this.$axios.get("api/common/GetDataMappings?src=ScanerTopic").then((res) => {
@@ -160,8 +177,19 @@ export default class searchList extends Component {
           subjectData: res.data.data,
         });
         console.log(this.state.subjectData);
-      }else {
-        message.warning(res.data.message)
+      } else {
+        message.warning(res.data.message);
+      }
+    });
+  }
+
+  // 获取扫描系统列表
+  getScanerTopics() {
+    this.$axios.get("api/Common/GetScanerTopics").then((res) => {
+      if (res.data.status === 0) {
+        this.setState({
+          scanerTopicList: res.data.data,
+        });
       }
     });
   }
@@ -481,7 +509,7 @@ export default class searchList extends Component {
               </div>
             </div>
 
-            <div className="condition_div">
+            {/* <div className="condition_div">
               <div className="div_title">查询类型</div>
               <div className="div_input">
                 <Select
@@ -499,10 +527,21 @@ export default class searchList extends Component {
                   <Option value={6}>扫描时间</Option>
                 </Select>
               </div>
-            </div>
+            </div> */}
 
             <div className="condition_div">
-              <div className="div_title">时间范围</div>
+              <Select
+                value={this.state.searchData.query_type}
+                bordered={false}
+                onChange={this.changeSelect.bind(this, "query_type")}
+              >
+                <Option value={1}>出票日期</Option>
+                <Option value={2}>起飞日期</Option>
+                <Option value={3}>实退时间</Option>
+                <Option value={4}>结算时间</Option>
+                <Option value={5}>导入时间</Option>
+                <Option value={6}>扫描时间</Option>
+              </Select>
               <div className="div_input">
                 <DatePicker
                   allowClear={false}
@@ -562,6 +601,41 @@ export default class searchList extends Component {
                       {item.data_text}
                     </Option>
                   ))}
+                </Select>
+              </div>
+            </div>
+
+            <div className="condition_div">
+              <div className="div_title">订单类型</div>
+              <div className="div_input">
+                <Select
+                  placeholder="请选择"
+                  style={{ width: 200 }}
+                  allowClear
+                  value={this.state.searchData.order_type}
+                  onChange={this.changeSelect.bind(this, "order_type")}
+                >
+                  {this.state.orderTypeList.map((item) => (
+                    <Option value={item.data_code} key={item.key_id}>
+                      {item.data_text}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+
+            <div className="condition_div">
+              <div className="div_title">是否退票</div>
+              <div className="div_input">
+                <Select
+                  placeholder="请选择"
+                  style={{ width: 200 }}
+                  allowClear
+                  value={this.state.searchData.is_refund}
+                  onChange={this.changeSelect.bind(this, "is_refund")}
+                >
+                  <Option value={true}>已退票</Option>
+                  <Option value={false}>未退票</Option>
                 </Select>
               </div>
             </div>
@@ -680,7 +754,31 @@ export default class searchList extends Component {
                 dataIndex="intl_flag"
                 render={(text) => <>{text ? "国际" : "国内"}</>}
               />
-              <Column title="票证类型" width={75} dataIndex="ticket_type" />
+              <Column
+                title="票证类型"
+                width={75}
+                dataIndex="ticket_type"
+                render={(text, render) => (
+                  <>
+                    <div>{text}</div>
+                    <div style={{fontSize: 12}}>
+                      [
+                      {this.state.orderTypeList.map((item) => {
+                        if (item.data_code === render.order_type) {
+                          return item.data_text;
+                        }
+                      })}
+                      ]
+                    </div>
+                  </>
+                )}
+              />
+              <Column
+                title="是否退票"
+                width={75}
+                dataIndex="is_refund"
+                render={(text) => (text ? "已退票" : text === false ? "未退票" : "-")}
+              />
               <Column title="票号" width={120} dataIndex="ticket_no" />
               <Column
                 title="出票时间"
