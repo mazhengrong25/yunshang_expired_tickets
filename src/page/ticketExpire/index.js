@@ -2,7 +2,7 @@
  * @Description: 票证过期时间设置
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2021-09-27 18:25:21
+ * @LastEditTime: 2021-09-30 09:34:22
  * @LastEditors: wish.WuJunLong
  */
 
@@ -40,7 +40,7 @@ export default class index extends Component {
           //类型：Object  可有字段  备注：无
           intl_flag: 0, //类型：Number  可有字段  备注：国际标识 0:国内/国际;1:国内;2:国际
           part_open: 0, //是否部分使用 0:所有;1:全程未使用;2:部分未使用;3:弃程部分使用;
-          airline: "", //   可有字段  备注：航司二字码
+          airline_code: "", //   可有字段  备注：航司二字码
         },
       },
 
@@ -61,35 +61,36 @@ export default class index extends Component {
       tableLoading: true,
     });
     this.$axios.post("api/TicketExpire/GetPage", this.state.searchData).then((res) => {
+      this.setState({
+        tableLoading: false,
+      });
       if (res.data.status === 0) {
         this.setState({
-          tableLoading: false,
           tableData: res.data,
         });
       }
     });
   }
 
-
-  changeSearchSelect = (label,val) => {
-    let data= this.state.searchData
-    data.condition[label] = val
+  changeSearchSelect = (label, val) => {
+    let data = this.state.searchData;
+    data.condition[label] = val;
     this.setState({
-      searchData: data
-    })
-  }
-  changeSearchInput = (label,val) => {
-    let data= this.state.searchData
-    data.condition[label] = val.target.value
+      searchData: data,
+    });
+  };
+  changeSearchInput = (label, val) => {
+    let data = this.state.searchData;
+    data.condition[label] = val.target.value;
     this.setState({
-      searchData: data
-    })
-  }
+      searchData: data, 
+    });
+  };
 
   // 编辑/删除数据
   editTableData(data, type) {
     if (type === "remove") {
-      let _that = this
+      let _that = this;
       confirm({
         centered: true,
         title: "是否确认删除该数据？",
@@ -148,46 +149,49 @@ export default class index extends Component {
       ticketModalData: data,
     });
   };
-  changeModalDataInput = (label,val) => {
+  changeModalDataInput = (label, val) => {
     let data = this.state.ticketModalData;
     data[label] = val.target.value;
     this.setState({
       ticketModalData: data,
     });
-  }
+  };
 
   // 弹窗内容提交
   submitModalData() {
-    console.log(this.state.ticketModalData)
-    if(!this.state.ticketModalData.airline_code){
-      return message.warning('请输入航司二字码')
+    console.log(this.state.ticketModalData);
+    if (!this.state.ticketModalData.airline_code) {
+      return message.warning("请输入航司二字码");
     }
 
-    let url 
-    if(this.state.ticketModalType === '新增'){
-      url = 'api/TicketExpire/Save'
-    }else {
-      url = 'api/TicketExpire/UpDate'
+    let url;
+    if (this.state.ticketModalType === "新增") {
+      url = "api/TicketExpire/Save";
+    } else {
+      url = "api/TicketExpire/UpDate";
     }
-    let data = this.state.ticketModalData
+    let data = this.state.ticketModalData;
 
-    data.expire_days = data.expire_days?Number(data.expire_days):0
-    data.effective_start = data.effective_start?this.$moment(data.effective_start).format('YYYY-MM-DDTHH:mm:ss'):null
-    data.effective_end = data.effective_end?this.$moment(data.effective_end).format('YYYY-MM-DDTHH:mm:ss'): null
+    data.expire_days = data.expire_days ? Number(data.expire_days) : 0;
+    data.effective_start = data.effective_start
+      ? this.$moment(data.effective_start).format("YYYY-MM-DDTHH:mm:ss")
+      : null;
+    data.effective_end = data.effective_end
+      ? this.$moment(data.effective_end).format("YYYY-MM-DDTHH:mm:ss")
+      : null;
 
-    this.$axios.post(url,data)
-      .then(res => {
-        console.log(res)
-        if(res.data.status === 0){
-          message.success(res.data.message)
-          this.setState({
-            ticketModalStatus: false,
-          });
-          this.getDataList();
-        }else {
-          message.warning(res.data.message)
-        }
-      })
+    this.$axios.post(url, data).then((res) => {
+      console.log(res);
+      if (res.data.status === 0) {
+        message.success(res.data.message);
+        this.setState({
+          ticketModalStatus: false,
+        });
+        this.getDataList();
+      } else {
+        message.warning(res.data.message);
+      }
+    });
   }
 
   componentDidMount() {
@@ -204,7 +208,10 @@ export default class index extends Component {
             <div className="box_list">
               <div className="list_title">国际标识</div>
               <div className="list_input">
-                <Select value={this.state.searchData.condition.intl_flag} onChange={this.changeSearchSelect.bind(this,'intl_flag')}>
+                <Select
+                  value={this.state.searchData.condition.intl_flag}
+                  onChange={this.changeSearchSelect.bind(this, "intl_flag")}
+                >
                   <Option value={0}>国内/国际</Option>
                   <Option value={1}>国内</Option>
                   <Option value={2}>国际</Option>
@@ -216,8 +223,8 @@ export default class index extends Component {
               <div className="list_title">航司二字码</div>
               <div className="list_input">
                 <Input
-                onChange={this.changeSearchInput.bind(this,'airline')}
-                  value={this.state.searchData.condition.airline}
+                  onChange={this.changeSearchInput.bind(this, "airline_code")}
+                  value={this.state.searchData.condition.airline_code}
                   placeholder="请输入航司二字码"
                   allowClear
                 ></Input>
@@ -227,7 +234,10 @@ export default class index extends Component {
             <div className="box_list">
               <div className="list_title">部分使用</div>
               <div className="list_input">
-                <Select value={this.state.searchData.condition.part_open} onChange={this.changeSearchSelect.bind(this,'part_open')}>
+                <Select
+                  value={this.state.searchData.condition.part_open}
+                  onChange={this.changeSearchSelect.bind(this, "part_open")}
+                >
                   <Option value={0}>不限</Option>
                   <Option value={1}>全程未使用</Option>
                   <Option value={2}>部分未使用</Option>
@@ -236,11 +246,13 @@ export default class index extends Component {
               </div>
             </div>
             <div className="box_list">
-              <Button type="primary" onClick={() => this.getDataList()}>搜索</Button>
+              <Button type="primary" onClick={() => this.getDataList()}>
+                搜索
+              </Button>
             </div>
             <div className="box_list">
               <Button type="primary" onClick={() => this.addTicketModalData()}>
-                加入过期票
+                加入过期票设置
               </Button>
             </div>
           </div>
@@ -296,12 +308,16 @@ export default class index extends Component {
               <Column
                 title="规则生效时间"
                 dataIndex="effective_start"
-                render={(text) => text?this.$moment(text).format("YYYY-MM-DD HH:mm:ss"):'不限'}
+                render={(text) =>
+                  text ? this.$moment(text).format("YYYY-MM-DD HH:mm:ss") : "不限"
+                }
               />
               <Column
                 title="规则过期时间"
                 dataIndex="effective_end"
-                render={(text) => text?this.$moment(text).format("YYYY-MM-DD HH:mm:ss"):'不限'}
+                render={(text) =>
+                  text ? this.$moment(text).format("YYYY-MM-DD HH:mm:ss") : "不限"
+                }
               />
               <Column
                 title="操作"
@@ -335,7 +351,7 @@ export default class index extends Component {
         </div>
 
         <Modal
-          title={this.state.ticketModalType + "过期票"}
+          title="过期票设置"
           visible={this.state.ticketModalStatus}
           onOk={() => this.submitModalData()}
           onCancel={() => this.setState({ ticketModalStatus: false })}
@@ -348,6 +364,7 @@ export default class index extends Component {
               <div className="list_title">国际标识</div>
               <div className="list_input">
                 <Select
+                disabled={this.state.ticketModalType === '编辑'}
                   value={this.state.ticketModalData.intl_flag}
                   onChange={this.changeModalDataSelect.bind(this, "intl_flag")}
                 >
@@ -362,6 +379,7 @@ export default class index extends Component {
               <div className="list_title">航司二字码</div>
               <div className="list_input">
                 <Input
+                disabled={this.state.ticketModalType === '编辑'}
                   value={this.state.ticketModalData.airline_code}
                   onChange={this.changeModalDataInput.bind(this, "airline_code")}
                   placeholder="航司二字码"

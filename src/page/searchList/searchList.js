@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-08-19 15:24:00
+ * @LastEditTime: 2021-10-09 14:18:48
  * @LastEditors: wish.WuJunLong
  */
 import React, { Component } from "react";
@@ -39,10 +39,17 @@ export default class searchList extends Component {
         yatp_order_no: "", //类型：String  必有字段  备注：YATP订单号
         pnr_code: "", //类型：String  必有字段  备注：PNR
         ticket_no: "", //类型：String  必有字段  备注：票号
-        usage_status: null, //类型：String  必有字段  备注：使用状态
+        usage_status: [], //类型：String  必有字段  备注：使用状态
         passengers_name: "", //类型：String  必有字段  备注：乘机人
         scaner_topic: null, //类型：String  必有字段  备注：扫描系统
+        query_way: 0, // 二次扫描
       },
+
+      recentStatus: false, // 结算审核结果
+
+      reportLoading: false,//报表下载加载
+
+      recentLoading: false, // 审核结果下载加载
 
       paginationData: {
         pageNo: 1, // 当前页
@@ -88,10 +95,12 @@ export default class searchList extends Component {
 
   // 查询列表
   getSearchList() {
+    let searchData = JSON.parse(JSON.stringify(this.state.searchData));
+    searchData.usage_status = String(searchData.usage_status);
     let data = {
       page_no: this.state.paginationData.pageNo, //类型：Number  必有字段  备注：页码
       page_size: this.state.paginationData.pageCount, //类型：Number  必有字段  备注：每页显示条数
-      condition: this.state.searchData,
+      condition: searchData,
     };
     this.$axios.post("api/overdueticket/getpage", data).then((res) => {
       if (res.data.status === 0) {
@@ -163,8 +172,13 @@ export default class searchList extends Component {
       if (res.data.status === 0) {
         this.setState({
           recentData: res.data.data,
+          recentStatus: true,
         });
         console.log(this.state.recentData);
+      } else {
+        this.setState({
+          recentStatus: false,
+        });
       }
     });
   }
@@ -239,9 +253,15 @@ export default class searchList extends Component {
 
   // 文件下载
   fileLoad = () => {
+    this.setState({
+      recentLoading: true
+    })
     this.$axios
       .get("api/OverdueTicket/DownloadResult", { responseType: "arraybuffer" })
       .then((res) => {
+        this.setState({
+          recentLoading: false
+        })
         if (res.status === 200) {
           const data = res.data;
           const url = window.URL.createObjectURL(
@@ -264,11 +284,19 @@ export default class searchList extends Component {
 
   // 报表下载
   reportLoad = () => {
+    this.setState({
+      reportLoading: true,
+    });
+    let searchData = JSON.parse(JSON.stringify(this.state.searchData));
+    searchData.usage_status = String(searchData.usage_status);
     this.$axios
-      .post("api/OverdueTicket/DownloadReport", this.state.searchData, {
+      .post("api/OverdueTicket/DownloadReport", searchData, {
         responseType: "arraybuffer",
       })
       .then((res) => {
+        this.setState({
+          reportLoading: false,
+        });
         if (res.status === 200) {
           const data = res.data;
           const url = window.URL.createObjectURL(
@@ -541,6 +569,7 @@ export default class searchList extends Component {
                 <Option value={4}>结算时间</Option>
                 <Option value={5}>导入时间</Option>
                 <Option value={6}>扫描时间</Option>
+                <Option value={7}>客票有效期</Option>
               </Select>
               <div className="div_input">
                 <DatePicker
@@ -574,6 +603,7 @@ export default class searchList extends Component {
                   placeholder="请选择"
                   style={{ width: 200 }}
                   allowClear
+                  mode="multiple"
                   value={this.state.searchData.usage_status}
                   onChange={this.changeSelect.bind(this, "usage_status")}
                 >
@@ -640,6 +670,22 @@ export default class searchList extends Component {
               </div>
             </div>
 
+            <div className="condition_div">
+              <div className="div_title">查询方式</div>
+              <div className="div_input">
+                <Select
+                  placeholder="请选择"
+                  style={{ width: 200 }}
+                  value={this.state.searchData.query_way}
+                  onChange={this.changeSelect.bind(this, "query_way")}
+                >
+                  <Option value={0}>最后扫描数据</Option>
+                  <Option value={1}>第一次扫描数据</Option>
+                  <Option value={2}>第二次扫描数据</Option>
+                </Select>
+              </div>
+            </div>
+
             {/* 表格操作 */}
             <div className="search_action">
               <div className="action_position">
@@ -667,7 +713,12 @@ export default class searchList extends Component {
                       )
                     }
                   >
-                    <Button type="primary" onClick={this.fileLoad}>
+                    <Button
+                      disabled={!this.state.recentStatus}
+                      type="primary"
+                      loading={this.state.recentLoading}
+                      onClick={this.fileLoad}
+                    >
                       下载结算审核结果
                     </Button>
                   </Tooltip>
@@ -706,7 +757,7 @@ export default class searchList extends Component {
               </div>
 
               <div className="action_position">
-                <Button type="primary" onClick={this.reportLoad}>
+                <Button loading={this.state.reportLoading} type="primary" onClick={this.reportLoad}>
                   报表下载
                 </Button>
               </div>
@@ -761,7 +812,7 @@ export default class searchList extends Component {
                 render={(text, render) => (
                   <>
                     <div>{text}</div>
-                    <div style={{fontSize: 12}}>
+                    <div style={{ fontSize: 12 }}>
                       [
                       {this.state.orderTypeList.map((item) => {
                         if (item.data_code === render.order_type) {
@@ -848,9 +899,9 @@ export default class searchList extends Component {
                       <div
                         style={{
                           color:
-                            text.indexOf("全部") !== -1
+                            text && text.indexOf("全部") !== -1
                               ? "#5AB957"
-                              : text.indexOf("部分") !== -1
+                              : text && text.indexOf("部分") !== -1
                               ? "#0070E2"
                               : "",
                         }}

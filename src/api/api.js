@@ -2,7 +2,7 @@
  * @Description:
  * @Author: mzr
  * @Date: 2021-07-08 14:01:46
- * @LastEditTime: 2021-08-27 11:24:32
+ * @LastEditTime: 2021-10-09 14:17:31
  * @LastEditors: wish.WuJunLong
  */
 import axios from "axios";
@@ -20,7 +20,7 @@ let baseUrl = "http://192.168.0.212:6991";
 axios.defaults.baseURL = baseUrl;
 
 let instance = axios.create({
-  timeout: 1000 * 12,
+  // timeout: 1000 * 12,
 });
 
 // http request 拦截器
@@ -41,6 +41,9 @@ instance.interceptors.request.use(
 // http response 拦截器
 instance.interceptors.response.use(
   (response) => {
+    if(response.data.status === 6){
+      message.warning(response.data.message)
+    }
     return response;
   },
   (error) => {
