@@ -2,8 +2,8 @@
  * @Description:
  * @Author: mzr
  * @Date: 2021-07-08 10:22:52
- * @LastEditTime: 2021-09-27 09:57:53
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2022-03-21 16:50:06
+ * @LastEditors: mzr
  */
 import React from "react";
 import ReactDOM from "react-dom";
@@ -14,6 +14,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import Index from "./page/index"; // 登录
 import searchList from "./page/searchList/searchList"; // 首页
 import TicketExpire from "./page/ticketExpire"; // 票证过期时间设置
+import TicketScan from "./page/ticketScan/ticketScan"; // 扫描黑名单
 
 import zhCN from "antd/es/locale/zh_CN";
 import { ConfigProvider } from "antd"; // 全局化配置
@@ -47,6 +48,8 @@ ReactDOM.render(
       <Route path="/expiredList" component={searchList}></Route>
       {/* 票证过期时间设置 */}
       <Route path="/ticketExpire" component={TicketExpire}></Route>
+      {/* 扫描黑名单 */}
+      <Route path="/ticketScan" component={TicketScan}></Route>
     </Router>
   </ConfigProvider>,
   document.getElementById("root")

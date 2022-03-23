@@ -2,8 +2,8 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2021-10-09 14:18:48
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2022-03-23 14:33:12
+ * @LastEditors: mzr
  */
 import React, { Component } from "react";
 import "../searchList/searchList.scss";
@@ -774,7 +774,8 @@ export default class searchList extends Component {
             <Table
               size="small"
               rowKey="key_id"
-              scroll={{ x: 2500 }}
+              // scroll={{ x: 2500 }}
+              scroll={{ x: 3300, y: "calc(100% - 50px)" }}
               pagination={false}
               // rowSelection={rowRadioSelection}
               dataSource={this.state.listData}
@@ -815,9 +816,9 @@ export default class searchList extends Component {
                     <div style={{ fontSize: 12 }}>
                       [
                       {this.state.orderTypeList.map((item) => {
-                        if (item.data_code === render.order_type) {
-                          return item.data_text;
-                        }
+
+                        return item.data_code === render.order_type ? item.data_text : ""
+
                       })}
                       ]
                     </div>
@@ -902,8 +903,8 @@ export default class searchList extends Component {
                             text && text.indexOf("全部") !== -1
                               ? "#5AB957"
                               : text && text.indexOf("部分") !== -1
-                              ? "#0070E2"
-                              : "",
+                                ? "#0070E2"
+                                : "",
                         }}
                       >
                         {text}

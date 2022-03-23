@@ -2,8 +2,8 @@
  * @Description: 票证过期时间设置
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2021-09-30 09:34:22
- * @LastEditors: wish.WuJunLong
+ * @LastEditTime: 2022-03-21 16:46:42
+ * @LastEditors: mzr
  */
 
 import React, { Component } from "react";
@@ -83,7 +83,7 @@ export default class index extends Component {
     let data = this.state.searchData;
     data.condition[label] = val.target.value;
     this.setState({
-      searchData: data, 
+      searchData: data,
     });
   };
 
@@ -252,7 +252,7 @@ export default class index extends Component {
             </div>
             <div className="box_list">
               <Button type="primary" onClick={() => this.addTicketModalData()}>
-                加入过期票设置
+                新增
               </Button>
             </div>
           </div>
@@ -271,10 +271,10 @@ export default class index extends Component {
                   text === 0
                     ? "国内/国际"
                     : text === 1
-                    ? "国内"
-                    : text === 2
-                    ? "国际"
-                    : text
+                      ? "国内"
+                      : text === 2
+                        ? "国际"
+                        : text
                 }
               />
               <Column title="航司二字码" dataIndex="airline_code" />
@@ -285,12 +285,12 @@ export default class index extends Component {
                   text === 0
                     ? "不限"
                     : text === 1
-                    ? "全程未使用"
-                    : text === 2
-                    ? "部分未使用"
-                    : text === 3
-                    ? "弃程部分使用"
-                    : text
+                      ? "全程未使用"
+                      : text === 2
+                        ? "部分未使用"
+                        : text === 3
+                          ? "弃程部分使用"
+                          : text
                 }
               />
               <Column
@@ -364,7 +364,7 @@ export default class index extends Component {
               <div className="list_title">国际标识</div>
               <div className="list_input">
                 <Select
-                disabled={this.state.ticketModalType === '编辑'}
+                  disabled={this.state.ticketModalType === '编辑'}
                   value={this.state.ticketModalData.intl_flag}
                   onChange={this.changeModalDataSelect.bind(this, "intl_flag")}
                 >
@@ -379,7 +379,7 @@ export default class index extends Component {
               <div className="list_title">航司二字码</div>
               <div className="list_input">
                 <Input
-                disabled={this.state.ticketModalType === '编辑'}
+                  disabled={this.state.ticketModalType === '编辑'}
                   value={this.state.ticketModalData.airline_code}
                   onChange={this.changeModalDataInput.bind(this, "airline_code")}
                   placeholder="航司二字码"

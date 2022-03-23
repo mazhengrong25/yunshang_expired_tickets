@@ -1,0 +1,39 @@
+.ticket_scan {
+  padding-bottom: 20px;
+  .ticket_scan_content {
+    background-color: #fff;
+    margin: 15px 30px;
+    padding: 20px;
+    .search_box {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      .box_list {
+        display: inline-flex;
+        align-items: center;
+        &:not(:last-child) {
+          margin-right: 20px;
+        }
+        .list_title {
+          font-size: 14px;
+          margin-right: 10px;
+        }
+        .list_input {
+          min-width: 180px;
+        }
+        .list_select {
+          min-width: 350px;
+          .ant-select {
+            width: 100%;
+          }
+        }
+      }
+    }
+    .ticket_scan_table {
+      .ant-pagination {
+        margin-top: 20px;
+        text-align: right;
+      }
+    }
+  }
+}
