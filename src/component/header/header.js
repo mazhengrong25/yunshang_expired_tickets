@@ -2,7 +2,7 @@
  * @Description: 页面 --- 头部
  * @Author: mzr
  * @Date: 2021-07-23 17:56:42
- * @LastEditTime: 2022-03-23 15:15:23
+ * @LastEditTime: 2022-03-24 16:09:39
  * @LastEditors: mzr
  */
 import React, { Component } from "react";
@@ -49,6 +49,9 @@ export default class header extends Component {
             <Link to="/expiredList" className={this.state.pathname === '/expiredList' ? 'list_btn active' : "list_btn"}>首页</Link>
             <Link to="/ticketExpire" className={this.state.pathname === '/ticketExpire' ? 'list_btn active' : "list_btn"}>客票有效期</Link>
             <Link to="/ticketScan" className={this.state.pathname === '/ticketScan' ? 'list_btn active' : "list_btn"}>扫描黑名单</Link>
+            <Link to="/openList" className={this.state.pathname === '/openList' ? 'list_btn active' : "list_btn"}>OPEN处理</Link>
+            <Link to="/openBatch" className={this.state.pathname === '/openBatch' ? 'list_btn active' : "list_btn"}>OPEN批次</Link>
+
           </div>
         </div>
 

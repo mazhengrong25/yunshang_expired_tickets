@@ -1,0 +1,28 @@
+.openBatch {
+  .openBatch_content {
+    padding-bottom: 20px;
+    background-color: #fff;
+    margin: 15px 30px;
+    padding: 20px;
+    .openBatch_content_form {
+      margin-bottom: 15px;
+      .openBatch_content_action {
+        display: inline-flex;
+        align-items: center;
+        justify-self: flex-start;
+        margin: 10px 0px 0px;
+        .action_item {
+          &:nth-child(2) {
+            margin: 10px 10px;
+          }
+        }
+      }
+    }
+    .openBatch_page {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 15px;
+    }
+  }
+}

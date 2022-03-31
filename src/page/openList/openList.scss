@@ -1,0 +1,17 @@
+.openList {
+  .openList_content {
+    padding-bottom: 20px;
+    background-color: #fff;
+    margin: 15px 30px;
+    padding: 20px;
+    .openList_content_form {
+      margin-bottom: 15px;
+    }
+    .openList_page {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin: 15px;
+    }
+  }
+}

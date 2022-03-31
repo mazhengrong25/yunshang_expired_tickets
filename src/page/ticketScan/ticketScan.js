@@ -2,7 +2,7 @@
  * @Description: 票证扫描 --- 黑名单
  * @Author: mzr
  * @Date: 2022-03-21 16:29:28
- * @LastEditTime: 2022-03-23 15:11:06
+ * @LastEditTime: 2022-03-28 18:39:36
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -68,7 +68,7 @@ function TicketScan() {
         if (res.status === 200) {
           setDataList({
             data: res.data.datas,
-            count: res.data.page_count
+            count: res.data.total_count
           })
         }
       })
@@ -133,11 +133,10 @@ function TicketScan() {
       })
       let newVal = JSON.parse(JSON.stringify(val))
       newVal.sales_channal_id = data
-
+      // newVal 对象
+      console.log('newVal', newVal)
       configForm.setFieldsValue(newVal)
-      // configForm.setFieldsValue(val)
 
-      console.log('弹窗', val)
     } else {
       configForm.resetFields();
     }
@@ -245,17 +244,9 @@ function TicketScan() {
 
   // 列表筛选
   const openSearch = (val) => {
-
     let condition = {
-      airline_code: "",
-      sales_channal_id: ""
-    }
-    if (val.airline_code) {
-      condition.airline_code = val.airline_code;
-
-    }
-    if (val.sales_channal_id) {
-      condition.sales_channal_id = val.sales_channal_id;
+      airline_code: val.airline_code,
+      sales_channal_id: val.sales_channal_id
     }
     setDataConfig({ ...dataConfig, condition: condition });
   };
@@ -343,6 +334,7 @@ function TicketScan() {
             current={dataConfig.page_no}
             pageSize={dataConfig.page_size}
             onChange={changePage}
+            showTotal={(total) => `共 ${total} 条`}
           ></Pagination>
 
           <Modal

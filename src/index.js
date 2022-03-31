@@ -2,7 +2,7 @@
  * @Description:
  * @Author: mzr
  * @Date: 2021-07-08 10:22:52
- * @LastEditTime: 2022-03-21 16:50:06
+ * @LastEditTime: 2022-03-24 16:09:41
  * @LastEditors: mzr
  */
 import React from "react";
@@ -15,6 +15,8 @@ import Index from "./page/index"; // 登录
 import searchList from "./page/searchList/searchList"; // 首页
 import TicketExpire from "./page/ticketExpire"; // 票证过期时间设置
 import TicketScan from "./page/ticketScan/ticketScan"; // 扫描黑名单
+import openList from "./page/openList/openList"; // OPEN处理列表
+import openBatch from "./page/openBatch/openBatch"; // OPEN批次
 
 import zhCN from "antd/es/locale/zh_CN";
 import { ConfigProvider } from "antd"; // 全局化配置
@@ -50,6 +52,10 @@ ReactDOM.render(
       <Route path="/ticketExpire" component={TicketExpire}></Route>
       {/* 扫描黑名单 */}
       <Route path="/ticketScan" component={TicketScan}></Route>
+      {/* OPEN处理列表 */}
+      <Route path="/openList" component={openList}></Route>
+      {/* OPEN批次 */}
+      <Route path="/openBatch" component={openBatch}></Route>
     </Router>
   </ConfigProvider>,
   document.getElementById("root")

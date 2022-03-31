@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2022-03-23 14:33:12
+ * @LastEditTime: 2022-03-30 18:28:56
  * @LastEditors: mzr
  */
 import React, { Component } from "react";
@@ -19,7 +19,6 @@ import {
   Button,
   Tooltip,
   Modal,
-  Upload,
 } from "antd";
 
 import Header from "../../component/header/header"; // 头部横幅
@@ -214,73 +213,73 @@ export default class searchList extends Component {
   };
 
   // 文件上传
-  fileUpload = () => {
-    const { fileList } = this.state;
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append("files[]", file);
-    });
+  // fileUpload = () => {
+  //   const { fileList } = this.state;
+  //   const formData = new FormData();
+  //   fileList.forEach((file) => {
+  //     formData.append("files[]", file);
+  //   });
 
-    this.setState({
-      uploading: true,
-    });
+  //   this.setState({
+  //     uploading: true,
+  //   });
 
-    this.$axios
-      .post("api/OverdueTicket/SettlementByFile", formData, { processData: false })
-      .then((res) => {
-        this.setState({
-          uploading: false,
-        });
-        if (res.data.status === 0) {
-          this.setState({
-            fileList: [],
-          });
-          this.getRecentSettle(); // 近期审核
-          message.success(res.data.message);
-        } else {
-          message.warning(res.data.message);
-        }
-      });
-  };
+  //   this.$axios
+  //     .post("api/OverdueTicket/SettlementByFile", formData, { processData: false })
+  //     .then((res) => {
+  //       this.setState({
+  //         uploading: false,
+  //       });
+  //       if (res.data.status === 0) {
+  //         this.setState({
+  //           fileList: [],
+  //         });
+  //         this.getRecentSettle(); // 近期审核
+  //         message.success(res.data.message);
+  //       } else {
+  //         message.warning(res.data.message);
+  //       }
+  //     });
+  // };
 
   // 删除文件
-  removeFileBtn = (e) => {
-    e.stopPropagation();
-    this.setState({
-      fileList: [],
-    });
-  };
+  // removeFileBtn = (e) => {
+  //   e.stopPropagation();
+  //   this.setState({
+  //     fileList: [],
+  //   });
+  // };
 
   // 文件下载
-  fileLoad = () => {
-    this.setState({
-      recentLoading: true
-    })
-    this.$axios
-      .get("api/OverdueTicket/DownloadResult", { responseType: "arraybuffer" })
-      .then((res) => {
-        this.setState({
-          recentLoading: false
-        })
-        if (res.status === 200) {
-          const data = res.data;
-          const url = window.URL.createObjectURL(
-            new Blob([data], {
-              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            })
-          );
-          const link = document.createElement("a");
-          link.style.display = "none";
-          link.href = url;
-          link.setAttribute("download", this.state.recentData.file_name);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          message.error(res.statusText);
-        }
-      });
-  };
+  // fileLoad = () => {
+  //   this.setState({
+  //     recentLoading: true
+  //   })
+  //   this.$axios
+  //     .get("api/OverdueTicket/DownloadResult", { responseType: "arraybuffer" })
+  //     .then((res) => {
+  //       this.setState({
+  //         recentLoading: false
+  //       })
+  //       if (res.status === 200) {
+  //         const data = res.data;
+  //         const url = window.URL.createObjectURL(
+  //           new Blob([data], {
+  //             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  //           })
+  //         );
+  //         const link = document.createElement("a");
+  //         link.style.display = "none";
+  //         link.href = url;
+  //         link.setAttribute("download", this.state.recentData.file_name);
+  //         document.body.appendChild(link);
+  //         link.click();
+  //         document.body.removeChild(link);
+  //       } else {
+  //         message.error(res.statusText);
+  //       }
+  //     });
+  // };
 
   // 报表下载
   reportLoad = () => {
@@ -351,14 +350,14 @@ export default class searchList extends Component {
   };
 
   // 对话框弹出
-  openModal = (val) => {
-    console.log("行", val);
-    this.setState({
-      modalData: JSON.parse(JSON.stringify(val)),
-      showModal: true,
-    });
-    this.getSalarySubject(); // 资金科目
-  };
+  // openModal = (val) => {
+  //   console.log("行", val);
+  //   this.setState({
+  //     modalData: JSON.parse(JSON.stringify(val)),
+  //     showModal: true,
+  //   });
+  //   this.getSalarySubject(); // 资金科目
+  // };
 
   // 对话框关闭
   closeModal = () => {
@@ -368,29 +367,29 @@ export default class searchList extends Component {
   };
 
   // 结算审核
-  getSettlement = () => {
-    let data = {
-      key_id: this.state.modalData.key_id, //类型：Number  必有字段  备注：表id
-      purchase_refund_price: Number(this.state.modalData.purchase_refund_price), //类型：Number  必有字段  备注：采购应退金额
-      purchase_actual_refund_price: Number(
-        this.state.modalData.purchase_actual_refund_price
-      ), //类型：Number  必有字段  备注：采购实退金额
-      purchase_actual_refund_subject: this.state.modalData.purchase_actual_refund_subject, //类型：String  必有字段  备注：采购实退科目
-      purchase_actual_refund_time: this.state.modalData.purchase_actual_refund_time, //类型：String  必有字段  备注：采购实退时间
-      settlement_status: Number(this.state.modalData.settlement_status), //类型：Number  必有字段  备注：结算状态 0-未结算 1-已结算
-    };
+  // getSettlement = () => {
+  //   let data = {
+  //     key_id: this.state.modalData.key_id, //类型：Number  必有字段  备注：表id
+  //     purchase_refund_price: Number(this.state.modalData.purchase_refund_price), //类型：Number  必有字段  备注：采购应退金额
+  //     purchase_actual_refund_price: Number(
+  //       this.state.modalData.purchase_actual_refund_price
+  //     ), //类型：Number  必有字段  备注：采购实退金额
+  //     purchase_actual_refund_subject: this.state.modalData.purchase_actual_refund_subject, //类型：String  必有字段  备注：采购实退科目
+  //     purchase_actual_refund_time: this.state.modalData.purchase_actual_refund_time, //类型：String  必有字段  备注：采购实退时间
+  //     settlement_status: Number(this.state.modalData.settlement_status), //类型：Number  必有字段  备注：结算状态 0-未结算 1-已结算
+  //   };
 
-    this.$axios.post("api/overdueticket/settlement", data).then((res) => {
-      if (res.data.status === 0) {
-        this.setState({
-          showModal: false,
-        });
-        message.info(res.data.message);
-      } else {
-        message.error(res.data.message);
-      }
-    });
-  };
+  //   this.$axios.post("api/overdueticket/settlement", data).then((res) => {
+  //     if (res.data.status === 0) {
+  //       this.setState({
+  //         showModal: false,
+  //       });
+  //       message.info(res.data.message);
+  //     } else {
+  //       message.error(res.data.message);
+  //     }
+  //   });
+  // };
 
   // 弹出框 选择器
   changeSelectModal = (label, e) => {
@@ -424,7 +423,7 @@ export default class searchList extends Component {
   };
 
   render() {
-    const { fileList } = this.state;
+    // const { fileList } = this.state;
     // 多选
     // const rowSelection = {
     //   selectedRowKeys,
@@ -437,26 +436,26 @@ export default class searchList extends Component {
     //   onChange: this.onSelectChange,
     // }
     // 手动上传
-    const props = {
-      onRemove: (file) => {
-        this.setState((state) => {
-          const index = state.fileList.indexOf(file);
-          const newFileList = state.fileList.slice();
-          newFileList.splice(index, 1);
-          return {
-            fileList: newFileList,
-          };
-        });
-      },
-      beforeUpload: (file) => {
-        console.log(file);
-        this.setState((state) => ({
-          fileList: [...state.fileList, file],
-        }));
-        return false;
-      },
-      fileList,
-    };
+    // const props = {
+    //   onRemove: (file) => {
+    //     this.setState((state) => {
+    //       const index = state.fileList.indexOf(file);
+    //       const newFileList = state.fileList.slice();
+    //       newFileList.splice(index, 1);
+    //       return {
+    //         fileList: newFileList,
+    //       };
+    //     });
+    //   },
+    //   beforeUpload: (file) => {
+    //     console.log(file);
+    //     this.setState((state) => ({
+    //       fileList: [...state.fileList, file],
+    //     }));
+    //     return false;
+    //   },
+    //   fileList,
+    // };
 
     return (
       <div className="searchList">
@@ -694,7 +693,7 @@ export default class searchList extends Component {
                 </Button>
               </div>
 
-              {this.state.recentData ? (
+              {/* {this.state.recentData ? (
                 <div className="action_position">
                   <Tooltip
                     placement="bottom"
@@ -739,6 +738,7 @@ export default class searchList extends Component {
                 ) : (
                   ""
                 )}
+
                 <Upload {...props}>
                   {this.state.fileList.length > 0 ? (
                     <span style={{ marginLeft: 10 }}>
@@ -753,8 +753,9 @@ export default class searchList extends Component {
                   ) : (
                     <Button type="primary">上传结算数据</Button>
                   )}
+
                 </Upload>
-              </div>
+              </div> */}
 
               <div className="action_position">
                 <Button loading={this.state.reportLoading} type="primary" onClick={this.reportLoad}>
@@ -764,29 +765,22 @@ export default class searchList extends Component {
             </div>
           </div>
 
-          {/* 列表操作 */}
-          {/* <div className="list_action">
-            <Button style={{ width: 120}}>结算</Button>
-          </div> */}
-
           {/* 列表 */}
           <div className="search_list">
             <Table
               size="small"
               rowKey="key_id"
-              // scroll={{ x: 2500 }}
-              scroll={{ x: 3300, y: "calc(100% - 50px)" }}
+              scroll={{ x: 3300, y: 500 }}
               pagination={false}
-              // rowSelection={rowRadioSelection}
               dataSource={this.state.listData}
               loading={this.state.tableLoading}
             >
               {/* <Column
                 title="编号"
                 width={100}
-                render= {(text,record,index) => (<div>{index + 1}</div>)}
+                render={(text, record, index) => (<div>{index + 1}</div>)}
               /> */}
-              <Column
+              {/* <Column
                 title="操作"
                 width={60}
                 fixed
@@ -799,8 +793,9 @@ export default class searchList extends Component {
                     </div>
                   </>
                 )}
-              />
+              /> */}
               <Column
+                fixed
                 title="订单类型"
                 width={75}
                 dataIndex="intl_flag"
@@ -839,7 +834,7 @@ export default class searchList extends Component {
                 render={(text) => <>{this.$moment(text).format("YYYY-MM-DD HH:mm:ss")}</>}
               />
               <Column title="航司二字码" width={80} dataIndex="airline_code" />
-              <Column title="YATP订单号" width={90} dataIndex="yatp_order_no" />
+              <Column title="YATP订单号" width={100} dataIndex="yatp_order_no" />
               <Column
                 title="PNR"
                 width={65}
@@ -919,7 +914,7 @@ export default class searchList extends Component {
                 dataIndex="purchase_actual_refund_subject"
                 render={(text) => <>{text || "--"}</>}
               />
-              <Column title="应退金额" width={50} dataIndex="purchase_refund_price" />
+              {/* <Column title="应退金额" width={50} dataIndex="purchase_refund_price" />
               <Column
                 title="实退金额"
                 width={50}
@@ -972,7 +967,7 @@ export default class searchList extends Component {
                 width={150}
                 dataIndex="settlement_time"
                 render={(text) => <>{this.$moment(text).format("YYYY-MM-DD HH:mm:ss")}</>}
-              />
+              /> */}
               <Column
                 title="起飞时间"
                 width={150}

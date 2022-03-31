@@ -1,8 +1,8 @@
 /*
- * @Description: 票证过期时间设置
+ * @Description: 客票有效期规则
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2022-03-21 16:46:42
+ * @LastEditTime: 2022-03-25 10:12:59
  * @LastEditors: mzr
  */
 
@@ -17,6 +17,7 @@ import {
   Modal,
   message,
   DatePicker,
+  Tooltip
 } from "antd";
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
@@ -29,6 +30,8 @@ const { Option } = Select;
 const { confirm } = Modal;
 const { Column } = Table;
 
+let timeout;
+let currentValue;
 export default class index extends Component {
   constructor(props) {
     super(props);
@@ -41,6 +44,7 @@ export default class index extends Component {
           intl_flag: 0, //类型：Number  可有字段  备注：国际标识 0:国内/国际;1:国内;2:国际
           part_open: 0, //是否部分使用 0:所有;1:全程未使用;2:部分未使用;3:弃程部分使用;
           airline_code: "", //   可有字段  备注：航司二字码
+          sales_channal_name: "", // 新增销售渠道
         },
       },
 
@@ -52,6 +56,10 @@ export default class index extends Component {
       ticketModalData: {}, // 新增编辑弹窗数据
 
       ticketModalType: "新增",
+
+
+      saleChannelList: [], // 销售渠道列表
+
     };
   }
 
@@ -115,8 +123,16 @@ export default class index extends Component {
       });
     } else {
       console.log(data);
+      // 处理销售渠道id
+      let channelList = []
+      data.sales_channal_id && data.sales_channal_id.split('/').map(item => {
+        return item ? channelList.push(item) : ''
+      })
+      let newVal = JSON.parse(JSON.stringify(data))
+      newVal.sales_channal_id = channelList
+
       this.setState({
-        ticketModalData: JSON.parse(JSON.stringify(data)),
+        ticketModalData: JSON.parse(JSON.stringify(newVal)),
         ticketModalType: "编辑",
         ticketModalStatus: true,
       });
@@ -133,6 +149,7 @@ export default class index extends Component {
       expire_days: 1, //类型：Number  必有字段  备注：过期时间（天数）
       effective_start: "", //类型：String  可有字段  备注：规则生效时间 为空表示不限
       effective_end: "", //类型：String  可有字段  备注：规则过期时间 为空表示不限
+      sales_channal_id: "", // 销售渠道
     };
     this.setState({
       ticketModalData: data,
@@ -179,6 +196,10 @@ export default class index extends Component {
     data.effective_end = data.effective_end
       ? this.$moment(data.effective_end).format("YYYY-MM-DDTHH:mm:ss")
       : null;
+    // 销售渠道
+    data.sales_channal_id = String(data.sales_channal_id).replace(/,/g, '/')
+
+
 
     this.$axios.post(url, data).then((res) => {
       console.log(res);
@@ -193,6 +214,50 @@ export default class index extends Component {
       }
     });
   }
+
+
+
+  // 获取销售渠道
+  fetch(value, callback) {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    currentValue = value;
+    let _that = this
+    function fake() {
+      let data = {
+        Limit: 12,                //类型：Number  必有字段  备注：返回数据条数
+        Keywords: value                //类型：String  可有字段  备注：检索关键字
+      };
+      _that.$axios.post("api/common/SearchSalesChannels", data)
+        .then((res) => {
+          if (res.data.status === 0) {
+            if (currentValue === value) {
+
+              const dataList = [];
+              res.data.data.forEach(r => {
+                dataList.push({
+                  value: r.value,
+                  text: r.text,
+                });
+              });
+              callback(dataList);
+            }
+          }
+        })
+    }
+
+    timeout = setTimeout(fake, 300);
+  }
+
+  handleSearch = (value) => {
+    if (value) {
+      this.fetch(value, saleChannelList => this.setState({ saleChannelList }));
+    } else {
+      this.setState({ saleChannelList: [] });
+    }
+  };
 
   componentDidMount() {
     this.getDataList();
@@ -245,6 +310,28 @@ export default class index extends Component {
                 </Select>
               </div>
             </div>
+
+            <div className="box_list">
+              <div className="list_title">销售渠道</div>
+              <div className="list_input">
+                <Select
+                  onSearch={this.handleSearch}
+                  showSearch
+                  style={{ width: 350 }}
+                  showArrow={false}
+                  allowClear
+                  filterOption={false}
+                  notFoundContent={null}
+                  placeholder="请选择销售渠道 支持模糊筛选"
+                  value={this.state.searchData.condition.sales_channal_name}
+                  onChange={this.changeSearchSelect.bind(this, "sales_channal_name")}
+                >
+                  {this.state.saleChannelList && this.state.saleChannelList.map((item) =>
+                    (<Option value={item.text} key={item.text}>{item.text}</Option>)
+                  )}
+                </Select>
+              </div>
+            </div>
             <div className="box_list">
               <Button type="primary" onClick={() => this.getDataList()}>
                 搜索
@@ -292,6 +379,35 @@ export default class index extends Component {
                           ? "弃程部分使用"
                           : text
                 }
+              />
+              <Column
+                title="销售渠道"
+                dataIndex="sales_channal_id"
+                width={250}
+                render={(text) => (
+                  <>
+                    <Tooltip
+                      title={() => (
+                        <>
+                          <p style={{ fontSize: "14px", marginBottom: "5px" }}>销售渠道</p>
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: "rgba(255, 255, 255, .8)",
+                              minWidth: "200px",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            {text}
+                          </p>
+                        </>
+                      )}
+                    >
+                      <span className="sales_channal_id">{text ? text : "--"}</span>
+                    </Tooltip>
+                  </>
+
+                )}
               />
               <Column
                 title="使用节点"
@@ -402,7 +518,28 @@ export default class index extends Component {
                 </Select>
               </div>
             </div>
-
+            <div className="modal_list">
+              <div className="list_title">销售渠道</div>
+              <div className="list_input">
+                <Select
+                  mode="multiple"
+                  onSearch={this.handleSearch}
+                  showSearch
+                  style={{ width: 505 }}
+                  showArrow={false}
+                  allowClear
+                  filterOption={false}
+                  notFoundContent={null}
+                  placeholder="请选择销售渠道 支持模糊筛选"
+                  value={this.state.ticketModalData.sales_channal_id}
+                  onChange={this.changeModalDataSelect.bind(this, "sales_channal_id")}
+                >
+                  {this.state.saleChannelList && this.state.saleChannelList.map((item) =>
+                    (<Option value={item.text} key={item.text}>{item.text}</Option>)
+                  )}
+                </Select>
+              </div>
+            </div>
             <div className="modal_list">
               <div className="list_title">使用节点</div>
               <div className="list_input">
@@ -435,6 +572,7 @@ export default class index extends Component {
                   placeholder="不限"
                   onChange={this.changeModalDataSelect.bind(this, "effective_start")}
                   showTime
+                  style={{ width: 200 }}
                   value={
                     this.state.ticketModalData.effective_start
                       ? this.$moment(this.state.ticketModalData.effective_start)
@@ -451,6 +589,7 @@ export default class index extends Component {
                   placeholder="不限"
                   onChange={this.changeModalDataSelect.bind(this, "effective_end")}
                   showTime
+                  style={{ width: 200 }}
                   value={
                     this.state.ticketModalData.effective_end
                       ? this.$moment(this.state.ticketModalData.effective_end)
@@ -459,6 +598,9 @@ export default class index extends Component {
                 />
               </div>
             </div>
+
+
+
           </div>
         </Modal>
       </div>
