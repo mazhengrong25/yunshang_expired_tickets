@@ -2,7 +2,7 @@
  * @Description: OPEN 处理列表
  * @Author: mzr
  * @Date: 2022-03-23 15:38:05
- * @LastEditTime: 2022-04-01 18:21:44
+ * @LastEditTime: 2022-04-01 19:06:50
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -93,7 +93,6 @@ function OpenList() {
     }
     axios.post("api/overdueticket/getopenpage", data)
       .then((res) => {
-        let newData = res.data.datas // 数据列表
         setDataListLoading(false);
         if (res.data.status === 0) {
 
@@ -107,15 +106,8 @@ function OpenList() {
             getOrderType()
           }
 
-          // 客票有效期
-          newData && newData.forEach((item) => {
-            if (item.ticket_validity && moment(item.ticket_validity).diff(moment(), 'd') <= 3 && moment(item.ticket_validity).diff(moment(), 'd') >= 0) {
-              item['ticket_validity_status'] = true
-            }
-          })
-
           setDataList({
-            data: newData,
+            data: res.data.datas,
             count: res.data.total_count
           })
         } else {
@@ -412,7 +404,7 @@ function OpenList() {
             dataIndex="ticket_validity"
             render={(text, render) => (
               <>
-                <div style={{ color: render.ticket_validity_status ? "#ff6161" : "" }}>
+                <div style={{ color: (moment(text).diff(moment(), 'd') <= 3 && moment(text).diff(moment(), 'd') >= 0) ? "#ff6161" : "" }}>
                   {text ? moment(text).format("YYYY-MM-DD HH:mm:ss") : "--"}
                 </div>
               </>

@@ -2,7 +2,7 @@
  * @Description: OPEN批次表
  * @Author: mzr
  * @Date: 2022-03-24 16:05:26
- * @LastEditTime: 2022-04-01 17:08:01
+ * @LastEditTime: 2022-04-01 19:16:44
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -545,7 +545,13 @@ function OpenBatch() {
             fixed
             title="客票有效期"
             dataIndex="ticket_validity"
-            render={(text) => <>{text ? moment(text).format("YYYY-MM-DD HH:mm:ss") : "--"}</>}
+            render={(text, render) => (
+              <>
+                <div style={{ color: (moment(text).diff(moment(), 'd') <= 3 && moment(text).diff(moment(), 'd') >= 0) ? "#ff6161" : "" }}>
+                  {text ? moment(text).format("YYYY-MM-DD HH:mm:ss") : "--"}
+                </div>
+              </>
+            )}
           />
           <Column
             title="订单类型"
