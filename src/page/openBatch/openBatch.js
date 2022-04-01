@@ -2,7 +2,7 @@
  * @Description: OPEN批次表
  * @Author: mzr
  * @Date: 2022-03-24 16:05:26
- * @LastEditTime: 2022-03-30 18:29:02
+ * @LastEditTime: 2022-04-01 17:08:01
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -33,7 +33,7 @@ moment.locale("zh-cn");
 
 const { Column } = Table;
 const { Option } = Select;
-
+const { RangePicker } = DatePicker;
 
 function OpenBatch() {
   const [dataConfig, setDataConfig] = useState({
@@ -49,10 +49,10 @@ function OpenBatch() {
       yatp_order_no: "", //类型：String  必有字段  备注：YATP订单号
       pnr_code: "", //类型：String  必有字段  备注：PNR
       ticket_no: "", //类型：String  必有字段  备注：票号
-      usage_status: "", //类型：String  必有字段  备注：使用状态
+      usage_status: "全部未使用", //类型：String  必有字段  备注：使用状态
       passengers_name: "", //类型：String  必有字段  备注：乘机人
       scan_topic: "", //类型：String  必有字段  备注：扫描系统
-      order_type: "", // 二次扫描
+      order_type: null, // 订单类型  为空时 placeholder没有效果
     },
 
   });
@@ -65,6 +65,7 @@ function OpenBatch() {
 
   const [applyStatus, setApplyStatus] = useState([]); //使用状态
   const [scanerSystem, setScanerSystem] = useState([]); //扫描系统
+  const [orderType, setOrderType] = useState([]); // 订单类型
 
   const [isConfigModal, setIsConfigModal] = useState(false); // 结算审核弹窗
   const [modalLoading, setModalLoading] = useState(false); // 结算审核弹窗确定加载
@@ -110,6 +111,9 @@ function OpenBatch() {
           if (scanerSystem.length < 1) {
             getScanerSystem()
           }
+          if (orderType.length < 1) {
+            getOrderType()
+          }
 
           if (verifyData) {
             recentVerify();
@@ -126,16 +130,17 @@ function OpenBatch() {
 
   // 筛选
   const openSearch = (val) => {
+
     let condition = {
       query_type: val.query_type,
-      begin_date: val.begin_date,
-      end_date: val.end_date,
+      begin_date: val.query_date ? moment(val.query_date[0]).format("YYYY-MM-DD") : moment().subtract(6, "months").format("YYYY-MM-DD"),
+      end_date: val.query_date ? moment(val.query_date[1]).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD"),
       intl_flag: val.intl_flag,
       airline_code: val.airline_code,
       yatp_order_no: val.yatp_order_no,
       pnr_code: val.pnr_code,
       ticket_no: val.ticket_no,
-      usage_status: val.usage_status,
+      usage_status: val.usage_status ? String(val.usage_status) : "",
       passengers_name: val.passengers_name,
       scaner_topic: val.scaner_topic,
       query_way: val.query_way,
@@ -173,6 +178,20 @@ function OpenBatch() {
           message.error(`获取扫描系统：${res.data.message}`)
         }
       })
+  }
+
+  // 订单类型
+  function getOrderType() {
+    axios.get("api/common/GetDataMappings?src=OrderType")
+      .then((res) => {
+        if (res.data.status === 0) {
+          setOrderType({
+            dataList: res.data.data
+          })
+        } else {
+          message.error(`获取订单类型：${res.data.message}`)
+        }
+      });
   }
 
   // 分页器
@@ -337,113 +356,98 @@ function OpenBatch() {
           <Form
             layout="inline"
             onFinish={openSearch}
-            initialValues={{ intl_flag: false, query_type: 1 }}
+            initialValues={dataConfig.condition}
           >
-            <Row gutter={[16, 16]}>
-              <Col span={4}>
-                <Form.Item label="国际国内" name="intl_flag">
-                  <Radio.Group>
-                    <Radio value={true}>国际</Radio>
-                    <Radio value={false}>国内</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
 
-              <Col span={4}>
-                <Form.Item label="票号" name="ticket_no">
-                  <Input placeholder="请输入票号" allowClear />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="航司" name="airline_code">
-                  <Input placeholder="请输入航司二字码" allowClear />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="YATP订单号" name="yatp_order_no">
-                  <Input placeholder="请输入YATP订单号" allowClear />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item name="query_type" noStyle>
-                  <Select
-                    bordered={false}
-                  >
-                    <Option value={1}>出票日期</Option>
-                    <Option value={2}>起飞日期</Option>
-                    <Option value={5}>导入时间</Option>
-                    <Option value={6}>扫描时间</Option>
-                  </Select>
-                </Form.Item>
-                <Form.Item name="begin_date" style={{ display: 'inline-block', width: 120 }}>
-                  <DatePicker
-                    allowClear={false}
-                    showToday={false}
-                  />
-                </Form.Item>
-                <Form.Item name="end_date" style={{ display: 'inline-block', width: 120 }}>
-                  <DatePicker
-                    allowClear={false}
-                    showToday={false}
-                  />
-                </Form.Item>
-              </Col>
+            <Form.Item label="国际标识" name="intl_flag">
+              <Radio.Group>
+                <Radio value={true}>国际</Radio>
+                <Radio value={false}>国内</Radio>
+              </Radio.Group>
+            </Form.Item>
 
 
-              <Col span={4}>
-                <Form.Item label="PNR" name="pnr_code">
-                  <Input placeholder="请输入pnr" allowClear />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="乘机人" name="passengers_name">
-                  <Input placeholder="请输入乘机人" allowClear />
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="使用状态" name="usage_status">
-                  <Select
-                    allowClear
-                    placeholder="请选择使用状态"
-                  >
-                    {
-                      applyStatus.dataList && applyStatus.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
-                    }
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="扫描系统" name="scaner_topic">
-                  <Select
-                    allowClear
-                    placeholder="请选择扫描系统"
-                  >
-                    {
-                      scanerSystem.dataList && scanerSystem.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
-                    }
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="订单类型" name="order_type">
-                  <Select
-                    allowClear
-                    placeholder="请选择订单类型"
-                  >
-                    <Option value="TicketsOrder">正常票</Option>
-                    <Option value="ChangeOrder">改期票</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
 
-              <Col span={4}>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    查询
-                  </Button>
-                </Form.Item>
-              </Col>
-            </Row>
+            <Form.Item label="票号" name="ticket_no">
+              <Input placeholder="请输入票号" allowClear />
+            </Form.Item>
+
+            <Form.Item label="航司" name="airline_code">
+              <Input placeholder="请输入航司二字码" allowClear />
+            </Form.Item>
+
+            <Form.Item label="YATP订单号" name="yatp_order_no">
+              <Input placeholder="请输入YATP订单号" allowClear />
+            </Form.Item>
+
+            <Form.Item name="query_type">
+              <Select
+                bordered={false}
+              >
+                <Option value={1}>出票日期</Option>
+                <Option value={2}>起飞日期</Option>
+                <Option value={3}>实退时间</Option>
+                <Option value={4}>结算时间</Option>
+                <Option value={5}>导入时间</Option>
+                <Option value={6}>扫描时间</Option>
+                <Option value={7}>客票有效期</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="query_date">
+              <RangePicker
+              />
+            </Form.Item>
+            <Form.Item label="PNR" name="pnr_code">
+              <Input placeholder="请输入pnr" allowClear />
+            </Form.Item>
+
+            <Form.Item label="乘机人" name="passengers_name">
+              <Input placeholder="请输入乘机人" allowClear />
+            </Form.Item>
+
+            <Form.Item label="使用状态" name="usage_status">
+              <Select
+                allowClear
+                mode="multiple"
+                placeholder="请选择使用状态"
+                style={{ width: 250 }}
+              >
+                {
+                  applyStatus.dataList && applyStatus.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                }
+              </Select>
+            </Form.Item>
+
+            <Form.Item label="扫描系统" name="scaner_topic">
+              <Select
+                allowClear
+                placeholder="请选择扫描系统"
+              >
+                {
+                  scanerSystem.dataList && scanerSystem.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                }
+              </Select>
+            </Form.Item>
+
+            <Form.Item label="订单类型" name="order_type">
+              <Select
+                allowClear
+                placeholder="请选择订单类型"
+                style={{ width: 150 }}
+              >
+                {
+                  orderType.dataList && orderType.dataList.map((item) => (<Option value={item.data_code} key={item.key_id}>{item.data_text}</Option>))
+                }
+              </Select>
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                查询
+              </Button>
+            </Form.Item>
+
+
           </Form>
           <div className="openBatch_content_action">
             <div className="action_item">
@@ -563,11 +567,6 @@ function OpenBatch() {
             )}
           />
           <Column
-            title="是否退票"
-            dataIndex="is_refund"
-            render={(text) => (text ? "已退票" : text === false ? "未退票" : "--")}
-          />
-          <Column
             title="使用状态"
             width={120}
             dataIndex="usage_status"
@@ -578,7 +577,7 @@ function OpenBatch() {
                     <>
                       <div>
                         <div style={{ fontSize: "14px", marginBottom: "5px" }}>
-                          使用状态
+                          扫描状态
                         </div>
                         <div
                           style={{
@@ -588,8 +587,8 @@ function OpenBatch() {
                             marginBottom: "5px",
                           }}
                         >
-                          <div>首次:{text ? text : "--"}</div>
-                          <div>再次:{render.second_usage_status ? render.second_usage_status : "--"}</div>
+                          <div>首次:{render.scan_msg ? render.scan_msg : "--"}</div>
+                          <div>再次:{render.second_scan_msg ? render.second_scan_msg : "--"}</div>
                         </div>
                       </div>
                     </>
@@ -622,7 +621,7 @@ function OpenBatch() {
                     <>
                       <div>
                         <p style={{ fontSize: "14px", marginBottom: "5px" }}>
-                          使用状态
+                          客票状态
                         </p>
                         <div
                           style={{

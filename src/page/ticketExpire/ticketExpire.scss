@@ -7,16 +7,16 @@
     .search_box {
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
+      flex-wrap: wrap;
       .box_list {
         display: inline-flex;
         align-items: center;
-        &:not(:last-child) {
-          margin-right: 20px;
-        }
+        margin: 0px 20px 20px 0px;
         .list_title {
           font-size: 14px;
           margin-right: 10px;
+          width: 70px;
+          text-align: right;
         }
         .list_input {
           min-width: 180px;

@@ -6,6 +6,19 @@
     padding: 20px;
     .openList_content_form {
       margin-bottom: 15px;
+      .ant-form-inline .ant-form-item {
+        margin-bottom: 10px;
+      }
+      .openList_content_action {
+        display: inline-flex;
+        align-items: center;
+        justify-self: flex-start;
+        .action_item {
+          &:not(:nth-child(1)) {
+            margin: 0px 10px;
+          }
+        }
+      }
     }
     .openList_page {
       display: flex;

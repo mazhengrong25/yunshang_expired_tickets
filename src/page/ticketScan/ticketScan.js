@@ -2,7 +2,7 @@
  * @Description: 票证扫描 --- 黑名单
  * @Author: mzr
  * @Date: 2022-03-21 16:29:28
- * @LastEditTime: 2022-03-28 18:39:36
+ * @LastEditTime: 2022-04-01 17:09:44
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -214,29 +214,6 @@ function TicketScan() {
     })
   }
 
-  // 处理销售渠道id
-  // function getSalesText(val) {
-  //   let data = []
-  //   let textName = ""
-  //   if (val) {
-  //     val && val.split('/').map(item => {
-  //       return item ? data.push(item) : ''
-  //     })
-  //     for (let i = 0; i < saleList.length; i++) {
-  //       for (let o = 0; o < data.length; o++) {
-  //         if (saleList[i].value === data[o]) {
-  //           textName += saleList[i].text + ' / '
-  //           break;
-  //         }
-  //       }
-  //     }
-  //   }
-
-
-
-  //   return textName || val
-  // }
-
   // 分页器
   const changePage = (page, pageSize) => {
     setDataConfig({ ...dataConfig, page_no: page, page_size: pageSize });
@@ -300,7 +277,6 @@ function TicketScan() {
             loading={dataListLoading}
           >
             <Column title="航司代码" dataIndex="airline_codes" width={270} />
-            {/*  render={text => getSalesText(text)}  */}
             <Column title="销售渠道" dataIndex="sales_channal_id" />
             <Column
               title="操作"

@@ -2,7 +2,7 @@
  * @Description: 客票有效期规则
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2022-03-25 10:12:59
+ * @LastEditTime: 2022-04-01 17:08:04
  * @LastEditors: mzr
  */
 
@@ -44,7 +44,7 @@ export default class index extends Component {
           intl_flag: 0, //类型：Number  可有字段  备注：国际标识 0:国内/国际;1:国内;2:国际
           part_open: 0, //是否部分使用 0:所有;1:全程未使用;2:部分未使用;3:弃程部分使用;
           airline_code: "", //   可有字段  备注：航司二字码
-          sales_channal_name: "", // 新增销售渠道
+          sales_channal_name: null, // 新增销售渠道
         },
       },
 
@@ -149,7 +149,7 @@ export default class index extends Component {
       expire_days: 1, //类型：Number  必有字段  备注：过期时间（天数）
       effective_start: "", //类型：String  可有字段  备注：规则生效时间 为空表示不限
       effective_end: "", //类型：String  可有字段  备注：规则过期时间 为空表示不限
-      sales_channal_id: "", // 销售渠道
+      sales_channal_id: null, // 销售渠道
     };
     this.setState({
       ticketModalData: data,
@@ -398,7 +398,7 @@ export default class index extends Component {
                               marginBottom: "5px",
                             }}
                           >
-                            {text}
+                            {text ? text : "--"}
                           </p>
                         </>
                       )}
