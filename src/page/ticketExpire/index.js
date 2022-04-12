@@ -2,7 +2,7 @@
  * @Description: 客票有效期规则
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2022-04-01 17:08:04
+ * @LastEditTime: 2022-04-12 18:17:07
  * @LastEditors: mzr
  */
 
@@ -79,6 +79,18 @@ export default class index extends Component {
       }
     });
   }
+
+  // 表格分页
+  changePage = (page, pageSize) => {
+    let data = this.state.searchData;
+    data["page_no"] = page;
+    data["page_size"] = pageSize;
+
+    this.setState({
+      searchData: data,
+    });
+    this.getDataList();
+  };
 
   changeSearchSelect = (label, val) => {
     let data = this.state.searchData;
@@ -460,8 +472,11 @@ export default class index extends Component {
             </Table>
 
             <Pagination
-              current={this.state.tableData.page_count}
+              showTotal={(total) => `共${total}条`}
+              showSizeChanger
+              current={this.state.tableData.page_no}
               total={this.state.tableData.total_count}
+              onChange={this.changePage}
             ></Pagination>
           </div>
         </div>

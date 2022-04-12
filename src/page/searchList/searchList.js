@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2022-03-30 18:28:56
+ * @LastEditTime: 2022-04-12 15:21:36
  * @LastEditors: mzr
  */
 import React, { Component } from "react";
@@ -44,11 +44,8 @@ export default class searchList extends Component {
         query_way: 0, // 二次扫描
       },
 
-      recentStatus: false, // 结算审核结果
 
       reportLoading: false,//报表下载加载
-
-      recentLoading: false, // 审核结果下载加载
 
       paginationData: {
         pageNo: 1, // 当前页
@@ -212,75 +209,6 @@ export default class searchList extends Component {
     this.getSearchList();
   };
 
-  // 文件上传
-  // fileUpload = () => {
-  //   const { fileList } = this.state;
-  //   const formData = new FormData();
-  //   fileList.forEach((file) => {
-  //     formData.append("files[]", file);
-  //   });
-
-  //   this.setState({
-  //     uploading: true,
-  //   });
-
-  //   this.$axios
-  //     .post("api/OverdueTicket/SettlementByFile", formData, { processData: false })
-  //     .then((res) => {
-  //       this.setState({
-  //         uploading: false,
-  //       });
-  //       if (res.data.status === 0) {
-  //         this.setState({
-  //           fileList: [],
-  //         });
-  //         this.getRecentSettle(); // 近期审核
-  //         message.success(res.data.message);
-  //       } else {
-  //         message.warning(res.data.message);
-  //       }
-  //     });
-  // };
-
-  // 删除文件
-  // removeFileBtn = (e) => {
-  //   e.stopPropagation();
-  //   this.setState({
-  //     fileList: [],
-  //   });
-  // };
-
-  // 文件下载
-  // fileLoad = () => {
-  //   this.setState({
-  //     recentLoading: true
-  //   })
-  //   this.$axios
-  //     .get("api/OverdueTicket/DownloadResult", { responseType: "arraybuffer" })
-  //     .then((res) => {
-  //       this.setState({
-  //         recentLoading: false
-  //       })
-  //       if (res.status === 200) {
-  //         const data = res.data;
-  //         const url = window.URL.createObjectURL(
-  //           new Blob([data], {
-  //             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  //           })
-  //         );
-  //         const link = document.createElement("a");
-  //         link.style.display = "none";
-  //         link.href = url;
-  //         link.setAttribute("download", this.state.recentData.file_name);
-  //         document.body.appendChild(link);
-  //         link.click();
-  //         document.body.removeChild(link);
-  //       } else {
-  //         message.error(res.statusText);
-  //       }
-  //     });
-  // };
-
   // 报表下载
   reportLoad = () => {
     this.setState({
@@ -365,31 +293,6 @@ export default class searchList extends Component {
       showModal: false,
     });
   };
-
-  // 结算审核
-  // getSettlement = () => {
-  //   let data = {
-  //     key_id: this.state.modalData.key_id, //类型：Number  必有字段  备注：表id
-  //     purchase_refund_price: Number(this.state.modalData.purchase_refund_price), //类型：Number  必有字段  备注：采购应退金额
-  //     purchase_actual_refund_price: Number(
-  //       this.state.modalData.purchase_actual_refund_price
-  //     ), //类型：Number  必有字段  备注：采购实退金额
-  //     purchase_actual_refund_subject: this.state.modalData.purchase_actual_refund_subject, //类型：String  必有字段  备注：采购实退科目
-  //     purchase_actual_refund_time: this.state.modalData.purchase_actual_refund_time, //类型：String  必有字段  备注：采购实退时间
-  //     settlement_status: Number(this.state.modalData.settlement_status), //类型：Number  必有字段  备注：结算状态 0-未结算 1-已结算
-  //   };
-
-  //   this.$axios.post("api/overdueticket/settlement", data).then((res) => {
-  //     if (res.data.status === 0) {
-  //       this.setState({
-  //         showModal: false,
-  //       });
-  //       message.info(res.data.message);
-  //     } else {
-  //       message.error(res.data.message);
-  //     }
-  //   });
-  // };
 
   // 弹出框 选择器
   changeSelectModal = (label, e) => {
@@ -692,71 +595,6 @@ export default class searchList extends Component {
                   查询
                 </Button>
               </div>
-
-              {/* {this.state.recentData ? (
-                <div className="action_position">
-                  <Tooltip
-                    placement="bottom"
-                    title={() =>
-                      this.state.recentData ? (
-                        <>
-                          <div>{this.state.recentData.file_name}</div>
-                          <div>
-                            {this.$moment(this.state.recentData.create_time).format(
-                              "YYYY-MM-DD HH:mm:ss"
-                            )}
-                          </div>
-                        </>
-                      ) : (
-                        ""
-                      )
-                    }
-                  >
-                    <Button
-                      disabled={!this.state.recentStatus}
-                      type="primary"
-                      loading={this.state.recentLoading}
-                      onClick={this.fileLoad}
-                    >
-                      下载结算审核结果
-                    </Button>
-                  </Tooltip>
-                </div>
-              ) : (
-                ""
-              )}
-
-              <div className="action_position action_upload">
-                {this.state.fileList.length > 0 ? (
-                  <Button
-                    type="primary"
-                    loading={this.state.uploading}
-                    onClick={this.fileUpload}
-                  >
-                    确认上传
-                  </Button>
-                ) : (
-                  ""
-                )}
-
-                <Upload {...props}>
-                  {this.state.fileList.length > 0 ? (
-                    <span style={{ marginLeft: 10 }}>
-                      {this.state.fileList[0].name}{" "}
-                      <span
-                        onClick={this.removeFileBtn}
-                        style={{ color: "red", fontSize: 12, cursor: "pointer" }}
-                      >
-                        删除
-                      </span>
-                    </span>
-                  ) : (
-                    <Button type="primary">上传结算数据</Button>
-                  )}
-
-                </Upload>
-              </div> */}
-
               <div className="action_position">
                 <Button loading={this.state.reportLoading} type="primary" onClick={this.reportLoad}>
                   报表下载

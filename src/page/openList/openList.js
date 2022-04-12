@@ -2,7 +2,7 @@
  * @Description: OPEN 处理列表
  * @Author: mzr
  * @Date: 2022-03-23 15:38:05
- * @LastEditTime: 2022-04-12 09:12:45
+ * @LastEditTime: 2022-04-12 17:54:50
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -109,6 +109,7 @@ function OpenList() {
           if (ticketStatus.length < 1) {
             getTicketStatus()
           }
+          setSelectedList([]);
           setDataList({
             data: res.data.datas,
             count: res.data.total_count
@@ -227,12 +228,11 @@ function OpenList() {
 
   // 多选数据
   const rowSelection = {
-    selectedRowKeys: selectedList,
+    selectedList,
     onChange: onSelectChange,
   };
 
   function onSelectChange(selectedRowKeys, selectedRows) {
-    // setSelectedList(selectedRowKeys) // 只取到key_id
     setSelectedList(selectedRows)
   };
 
@@ -247,11 +247,12 @@ function OpenList() {
       message.warn("请选择要修改的数据 至少选择一条")
     } else {
       let newVal = JSON.parse(JSON.stringify(selectedList[0]))
+      // 客票有效期
       if (newVal.ticket_validity) {
         newVal.ticket_validity = moment(newVal.ticket_validity)
       }
       configForm.setFieldsValue(newVal)
-
+      console.log('selectedList', selectedList)
       setIsConfigModal(true);
     }
   }
@@ -260,23 +261,16 @@ function OpenList() {
   const submitModal = async () => {
     setIsConfigModal(true);
     let modalData = configForm.getFieldValue();
-
-    // let data = []
-    // selectedList && selectedList.forEach(item => {
-    //   data.push({
-    //     key_id: modalData.key_id,
-    //     second_ticket_status: ticketStatus,
-    //     ticket_validity: modalData.ticket_validity
-    //   })
-    // })
     let ticketStatus = `${String(modalData.second_ticket_status).replace(/,/g, '-')}`
-    let data = [
-      {
-        key_id: modalData.key_id,
+
+    let data = []
+    selectedList && selectedList.forEach(item => {
+      data.push({
+        key_id: item.key_id,
         second_ticket_status: ticketStatus,
         ticket_validity: modalData.ticket_validity
-      }
-    ]
+      })
+    })
     await axios.post("api/OverdueTicket/UpdateOfOpen", data)
       .then((res) => {
         if (res.data.status === 0) {
@@ -337,7 +331,7 @@ function OpenList() {
             <Form.Item label="乘机人" name="passengers_name">
               <Input placeholder="请输入乘机人" allowClear />
             </Form.Item>
-            <Form.Item label="使用状态" name="usage_status">
+            <Form.Item label="使用状态" name="usage_status" initialValue={applyStatus}>
               <Select
                 allowClear
                 mode="multiple"
@@ -667,6 +661,7 @@ function OpenList() {
             <Form.Item
               label="客票状态"
               name="second_ticket_status"
+              initialValue={ticketStatus}
             >
               <Select
                 mode="multiple"
