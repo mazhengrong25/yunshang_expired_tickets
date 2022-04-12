@@ -2,7 +2,7 @@
  * @Description: 票证扫描 --- 黑名单
  * @Author: mzr
  * @Date: 2022-03-21 16:29:28
- * @LastEditTime: 2022-04-01 17:09:44
+ * @LastEditTime: 2022-04-11 18:08:13
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -322,7 +322,7 @@ function TicketScan() {
             onCancel={() => setIsConfigModal(false)}
           >
             <Form
-              layout="vertical"
+
               form={configForm}
             >
 

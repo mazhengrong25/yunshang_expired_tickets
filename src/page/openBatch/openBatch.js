@@ -2,7 +2,7 @@
  * @Description: OPEN批次表
  * @Author: mzr
  * @Date: 2022-03-24 16:05:26
- * @LastEditTime: 2022-04-01 19:16:44
+ * @LastEditTime: 2022-04-11 15:23:44
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -157,9 +157,10 @@ function OpenBatch() {
     axios.get("api/common/GetDataMappings?src=UsageStatus")
       .then((res) => {
         if (res.data.status === 0) {
-          setApplyStatus({
-            dataList: res.data.data
-          })
+          setApplyStatus(res.data.data)
+          // setApplyStatus({
+          //   dataList: res.data.data
+          // })
         } else {
           message.error(`获取使用状态：${res.data.message}`)
         }
@@ -171,9 +172,10 @@ function OpenBatch() {
     axios.get("api/common/GetDataMappings?src=ScanerTopic")
       .then((res) => {
         if (res.data.status === 0) {
-          setScanerSystem({
-            dataList: res.data.data
-          })
+          setScanerSystem(res.data.data)
+          // setScanerSystem({
+          //   dataList: res.data.data
+          // })
         } else {
           message.error(`获取扫描系统：${res.data.message}`)
         }
@@ -185,9 +187,10 @@ function OpenBatch() {
     axios.get("api/common/GetDataMappings?src=OrderType")
       .then((res) => {
         if (res.data.status === 0) {
-          setOrderType({
-            dataList: res.data.data
-          })
+          setOrderType(res.data.data)
+          // setOrderType({
+          //   dataList: res.data.data
+          // })
         } else {
           message.error(`获取订单类型：${res.data.message}`)
         }
@@ -413,7 +416,7 @@ function OpenBatch() {
                 style={{ width: 250 }}
               >
                 {
-                  applyStatus.dataList && applyStatus.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                  applyStatus && applyStatus.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>
@@ -424,7 +427,7 @@ function OpenBatch() {
                 placeholder="请选择扫描系统"
               >
                 {
-                  scanerSystem.dataList && scanerSystem.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                  scanerSystem && scanerSystem.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>
@@ -436,7 +439,7 @@ function OpenBatch() {
                 style={{ width: 150 }}
               >
                 {
-                  orderType.dataList && orderType.dataList.map((item) => (<Option value={item.data_code} key={item.key_id}>{item.data_text}</Option>))
+                  orderType && orderType.map((item) => (<Option value={item.data_code} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>

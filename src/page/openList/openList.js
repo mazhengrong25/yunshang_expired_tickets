@@ -2,7 +2,7 @@
  * @Description: OPEN 处理列表
  * @Author: mzr
  * @Date: 2022-03-23 15:38:05
- * @LastEditTime: 2022-04-01 19:06:50
+ * @LastEditTime: 2022-04-12 09:12:45
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -18,7 +18,7 @@ import {
   Pagination,
   Modal,
   DatePicker,
-  message
+  message,
 } from "antd";
 
 import Header from "../../component/header/header"; // 头部横幅
@@ -62,6 +62,7 @@ function OpenList() {
   const [applyStatus, setApplyStatus] = useState([]); //使用状态
   const [scanerSystem, setScanerSystem] = useState([]); //扫描系统
   const [orderType, setOrderType] = useState([]); // 订单类型
+  const [ticketStatus, setTicketStatus] = useState([]); // 客票类型
 
   const [reportLoading, setReportLoading] = useState(false); // 报表下载加载
 
@@ -105,7 +106,9 @@ function OpenList() {
           if (orderType.length < 1) {
             getOrderType()
           }
-
+          if (ticketStatus.length < 1) {
+            getTicketStatus()
+          }
           setDataList({
             data: res.data.datas,
             count: res.data.total_count
@@ -121,9 +124,7 @@ function OpenList() {
     axios.get("api/common/GetDataMappings?src=UsageStatus")
       .then((res) => {
         if (res.data.status === 0) {
-          setApplyStatus({
-            dataList: res.data.data
-          })
+          setApplyStatus(res.data.data)
         } else {
           message.error(`获取使用状态：${res.data.message}`)
         }
@@ -135,9 +136,7 @@ function OpenList() {
     axios.get("api/common/GetDataMappings?src=ScanerTopic")
       .then((res) => {
         if (res.data.status === 0) {
-          setScanerSystem({
-            dataList: res.data.data
-          })
+          setScanerSystem(res.data.data)
         } else {
           message.error(`获取扫描系统：${res.data.message}`)
         }
@@ -149,11 +148,21 @@ function OpenList() {
     axios.get("api/common/GetDataMappings?src=OrderType")
       .then((res) => {
         if (res.data.status === 0) {
-          setOrderType({
-            dataList: res.data.data
-          })
+          setOrderType(res.data.data)
         } else {
           message.error(`获取订单类型：${res.data.message}`)
+        }
+      });
+  }
+
+  // 客票状态
+  function getTicketStatus() {
+    axios.get("api/common/GetDataMappings?src=TicketStatus")
+      .then((res) => {
+        if (res.data.status === 0) {
+          setTicketStatus(res.data.data)
+        } else {
+          message.error(`获取客票状态：${res.data.message}`)
         }
       });
   }
@@ -192,7 +201,7 @@ function OpenList() {
     setReportLoading(true)
     let searchData = JSON.parse(JSON.stringify(dataConfig.condition))
     axios.post("api/OverdueTicket/DownloadOpenReport", searchData, {
-      responseType: "arraybuffer",
+      responseType: "blob",
     })
       .then((res) => {
         setReportLoading(false)
@@ -223,7 +232,8 @@ function OpenList() {
   };
 
   function onSelectChange(selectedRowKeys, selectedRows) {
-    setSelectedList(selectedRowKeys)
+    // setSelectedList(selectedRowKeys) // 只取到key_id
+    setSelectedList(selectedRows)
   };
 
 
@@ -237,6 +247,9 @@ function OpenList() {
       message.warn("请选择要修改的数据 至少选择一条")
     } else {
       let newVal = JSON.parse(JSON.stringify(selectedList[0]))
+      if (newVal.ticket_validity) {
+        newVal.ticket_validity = moment(newVal.ticket_validity)
+      }
       configForm.setFieldsValue(newVal)
 
       setIsConfigModal(true);
@@ -247,14 +260,23 @@ function OpenList() {
   const submitModal = async () => {
     setIsConfigModal(true);
     let modalData = configForm.getFieldValue();
-    let data = []
-    selectedList && selectedList.forEach(item => {
-      data.push({
-        key_id: item,
-        second_ticket_status: modalData.second_ticket_status
-      })
-    })
 
+    // let data = []
+    // selectedList && selectedList.forEach(item => {
+    //   data.push({
+    //     key_id: modalData.key_id,
+    //     second_ticket_status: ticketStatus,
+    //     ticket_validity: modalData.ticket_validity
+    //   })
+    // })
+    let ticketStatus = `${String(modalData.second_ticket_status).replace(/,/g, '-')}`
+    let data = [
+      {
+        key_id: modalData.key_id,
+        second_ticket_status: ticketStatus,
+        ticket_validity: modalData.ticket_validity
+      }
+    ]
     await axios.post("api/OverdueTicket/UpdateOfOpen", data)
       .then((res) => {
         if (res.data.status === 0) {
@@ -323,7 +345,7 @@ function OpenList() {
                 style={{ width: 250 }}
               >
                 {
-                  applyStatus.dataList && applyStatus.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                  applyStatus && applyStatus.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>
@@ -333,7 +355,7 @@ function OpenList() {
                 placeholder="请选择扫描系统"
               >
                 {
-                  scanerSystem.dataList && scanerSystem.dataList.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
+                  scanerSystem && scanerSystem.map((item) => (<Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>
@@ -344,7 +366,7 @@ function OpenList() {
                 style={{ width: 150 }}
               >
                 {
-                  orderType.dataList && orderType.dataList.map((item) => (<Option value={item.data_code} key={item.key_id}>{item.data_text}</Option>))
+                  orderType && orderType.map((item) => (<Option value={item.data_code} key={item.key_id}>{item.data_text}</Option>))
                 }
               </Select>
             </Form.Item>
@@ -384,6 +406,7 @@ function OpenList() {
         <Table
           size="small"
           rowKey="key_id"
+          className="ticket_open_table"
           dataSource={dataList.data}
           pagination={false}
           loading={dataListLoading}
@@ -472,7 +495,7 @@ function OpenList() {
             )}
           />
           <Column
-            width={135}
+            width={200}
             title="客票状态"
             dataIndex="ticket_status"
             render={(text, render) => (
@@ -628,23 +651,41 @@ function OpenList() {
         <Modal
           title="修改OPEN处理"
           centered
-          width={650}
+          width={500}
           visible={isConfigModal}
           onOk={() => submitModal()}
           onCancel={() => setIsConfigModal(false)}
         >
           <Form
-            layout="inline"
             form={configForm}
+            labelCol={{ span: 10 }}
+            wrapperCol={{ span: 16 }}
           >
-
+            <Form.Item label="行程" name="trip_code">
+              <Input bordered={false} disabled />
+            </Form.Item>
             <Form.Item
-              label="客票类型"
+              label="客票状态"
               name="second_ticket_status"
             >
-              <Input placeholder="请输入客票类型" allowClear />
-            </Form.Item>
+              <Select
+                mode="multiple"
+                style={{ width: 200 }}
+                showSearch
+                placeholder="请选择客票状态"
+              >
+                {
+                  ticketStatus && ticketStatus.map((item) => <Option value={item.data_text} key={item.key_id}>{item.data_text}</Option>)
+                }
+              </Select>
 
+            </Form.Item>
+            <Form.Item
+              label="客票有效期"
+              name="ticket_validity"
+            >
+              <DatePicker showTime />
+            </Form.Item>
           </Form>
         </Modal>
 
