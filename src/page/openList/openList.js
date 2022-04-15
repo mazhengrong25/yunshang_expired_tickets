@@ -2,7 +2,7 @@
  * @Description: OPEN 处理列表
  * @Author: mzr
  * @Date: 2022-03-23 15:38:05
- * @LastEditTime: 2022-04-12 17:54:50
+ * @LastEditTime: 2022-04-14 17:15:06
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -56,7 +56,11 @@ function OpenList() {
   });
   const [dataList, setDataList] = useState([]); // 数据列表
   const [dataListLoading, setDataListLoading] = useState(false); // 数据列表加载
-  const [selectedList, setSelectedList] = useState([]); // 表格所选列表
+  const [selectedList, setSelectedList] = useState({
+    selectedRowKeys: [],
+    selectedRows: []
+  }); // 选中表格项
+
   const [isConfigModal, setIsConfigModal] = useState(false); // 修改弹窗
 
   const [applyStatus, setApplyStatus] = useState([]); //使用状态
@@ -109,7 +113,6 @@ function OpenList() {
           if (ticketStatus.length < 1) {
             getTicketStatus()
           }
-          setSelectedList([]);
           setDataList({
             data: res.data.datas,
             count: res.data.total_count
@@ -180,7 +183,7 @@ function OpenList() {
       yatp_order_no: val.yatp_order_no,
       pnr_code: val.pnr_code,
       ticket_no: val.ticket_no,
-      usage_status: val.usage_status ? String(val.usage_status) : "",
+      usage_status: val.usage_status ? `/${String(val.usage_status).replace(/,/g, '/')}/` : "",
       passengers_name: val.passengers_name,
       scaner_topic: val.scaner_topic,
       query_way: val.query_way,
@@ -228,14 +231,13 @@ function OpenList() {
 
   // 多选数据
   const rowSelection = {
-    selectedList,
+    selectedRowKeys: selectedList.selectedRowKeys,
     onChange: onSelectChange,
   };
 
   function onSelectChange(selectedRowKeys, selectedRows) {
-    setSelectedList(selectedRows)
+    setSelectedList({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
   };
-
 
   // 数据弹窗
   const [configForm] = Form.useForm();
@@ -243,16 +245,15 @@ function OpenList() {
 
   // 修改
   function openModal() {
-    if (selectedList.length < 1) {
+    if (selectedList.selectedRows && selectedList.selectedRows.length < 1) {
       message.warn("请选择要修改的数据 至少选择一条")
     } else {
-      let newVal = JSON.parse(JSON.stringify(selectedList[0]))
+      let newVal = JSON.parse(JSON.stringify(selectedList.selectedRows[0]))
       // 客票有效期
       if (newVal.ticket_validity) {
         newVal.ticket_validity = moment(newVal.ticket_validity)
       }
       configForm.setFieldsValue(newVal)
-      console.log('selectedList', selectedList)
       setIsConfigModal(true);
     }
   }
@@ -264,7 +265,7 @@ function OpenList() {
     let ticketStatus = `${String(modalData.second_ticket_status).replace(/,/g, '-')}`
 
     let data = []
-    selectedList && selectedList.forEach(item => {
+    selectedList.selectedRows && selectedList.selectedRows.forEach(item => {
       data.push({
         key_id: item.key_id,
         second_ticket_status: ticketStatus,
@@ -276,15 +277,13 @@ function OpenList() {
         if (res.data.status === 0) {
           message.success(res.data.message)
           setIsConfigModal(false);
-          setSelectedList([])
+          setSelectedList({ selectedRowKeys: [], selectedRows: [] })
           getDataList();
         } else {
           message.error(res.data.message)
         }
       })
   }
-
-
 
   return (
     <div className="openList">
@@ -331,7 +330,7 @@ function OpenList() {
             <Form.Item label="乘机人" name="passengers_name">
               <Input placeholder="请输入乘机人" allowClear />
             </Form.Item>
-            <Form.Item label="使用状态" name="usage_status" initialValue={applyStatus}>
+            <Form.Item label="使用状态" name="usage_status">
               <Select
                 allowClear
                 mode="multiple"

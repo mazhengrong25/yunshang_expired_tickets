@@ -2,7 +2,7 @@
  * @Description: 分页查询
  * @Author: mzr
  * @Date: 2021-07-08 14:18:29
- * @LastEditTime: 2022-04-12 15:21:36
+ * @LastEditTime: 2022-04-15 09:07:41
  * @LastEditors: mzr
  */
 import React, { Component } from "react";
@@ -118,7 +118,6 @@ export default class searchList extends Component {
 
   // 分页
   changePage = (page, pageSize) => {
-    console.log(page, pageSize);
     let data = this.state.paginationData;
     data["pageNo"] = page;
     data["pageCount"] = pageSize;
@@ -170,7 +169,6 @@ export default class searchList extends Component {
           recentData: res.data.data,
           recentStatus: true,
         });
-        console.log(this.state.recentData);
       } else {
         this.setState({
           recentStatus: false,
@@ -186,7 +184,6 @@ export default class searchList extends Component {
         this.setState({
           subjectData: res.data.data,
         });
-        console.log(this.state.subjectData);
       } else {
         message.warning(res.data.message);
       }
@@ -246,8 +243,6 @@ export default class searchList extends Component {
 
   // 选择器
   changeSelect = (label, val) => {
-    console.log(label, val);
-
     let data = this.state.searchData;
     data[label] = val;
     this.setState({
@@ -257,7 +252,6 @@ export default class searchList extends Component {
 
   // 输入框,单选框
   changeInput = (label, val) => {
-    console.log(label, val.target.value);
 
     let data = this.state.searchData;
     data[label] = val.target.value;
@@ -268,7 +262,6 @@ export default class searchList extends Component {
 
   // 日期选择
   changeDate = (label, date, dateString) => {
-    console.log(label, dateString);
 
     let data = this.state.searchData;
     data[label] = dateString ? this.$moment(dateString).format("YYYY-MM-DD") : null;
@@ -296,8 +289,6 @@ export default class searchList extends Component {
 
   // 弹出框 选择器
   changeSelectModal = (label, e) => {
-    console.log(label, e);
-
     let data = this.state.modalData;
     data[label] = e;
     this.setState({
@@ -316,7 +307,6 @@ export default class searchList extends Component {
 
   // 弹出框 日期
   changeDateModal = (label, date, dateString) => {
-    console.log(label, dateString);
 
     let data = this.state.modalData;
     data[label] = dateString;

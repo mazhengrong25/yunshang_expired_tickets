@@ -2,7 +2,7 @@
  * @Description: 客票有效期规则
  * @Author: wish.WuJunLong
  * @Date: 2021-09-27 09:50:57
- * @LastEditTime: 2022-04-12 18:17:07
+ * @LastEditTime: 2022-04-15 09:06:21
  * @LastEditors: mzr
  */
 
@@ -134,7 +134,6 @@ export default class index extends Component {
         },
       });
     } else {
-      console.log(data);
       // 处理销售渠道id
       let channelList = []
       data.sales_channal_id && data.sales_channal_id.split('/').map(item => {
@@ -188,7 +187,6 @@ export default class index extends Component {
 
   // 弹窗内容提交
   submitModalData() {
-    console.log(this.state.ticketModalData);
     if (!this.state.ticketModalData.airline_code) {
       return message.warning("请输入航司二字码");
     }
@@ -214,7 +212,6 @@ export default class index extends Component {
 
 
     this.$axios.post(url, data).then((res) => {
-      console.log(res);
       if (res.data.status === 0) {
         message.success(res.data.message);
         this.setState({

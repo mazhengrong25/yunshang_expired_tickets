@@ -2,7 +2,7 @@
  * @Description: OPEN批次表
  * @Author: mzr
  * @Date: 2022-03-24 16:05:26
- * @LastEditTime: 2022-04-11 15:23:44
+ * @LastEditTime: 2022-04-14 17:27:37
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -140,7 +140,7 @@ function OpenBatch() {
       yatp_order_no: val.yatp_order_no,
       pnr_code: val.pnr_code,
       ticket_no: val.ticket_no,
-      usage_status: val.usage_status ? String(val.usage_status) : "",
+      usage_status: val.usage_status ? `/${String(val.usage_status).replace(/,/g, '/')}/` : "",
       passengers_name: val.passengers_name,
       scaner_topic: val.scaner_topic,
       query_way: val.query_way,
@@ -158,9 +158,6 @@ function OpenBatch() {
       .then((res) => {
         if (res.data.status === 0) {
           setApplyStatus(res.data.data)
-          // setApplyStatus({
-          //   dataList: res.data.data
-          // })
         } else {
           message.error(`获取使用状态：${res.data.message}`)
         }
@@ -173,9 +170,6 @@ function OpenBatch() {
       .then((res) => {
         if (res.data.status === 0) {
           setScanerSystem(res.data.data)
-          // setScanerSystem({
-          //   dataList: res.data.data
-          // })
         } else {
           message.error(`获取扫描系统：${res.data.message}`)
         }
@@ -188,9 +182,6 @@ function OpenBatch() {
       .then((res) => {
         if (res.data.status === 0) {
           setOrderType(res.data.data)
-          // setOrderType({
-          //   dataList: res.data.data
-          // })
         } else {
           message.error(`获取订单类型：${res.data.message}`)
         }

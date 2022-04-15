@@ -2,7 +2,7 @@
  * @Description: 票证扫描 --- 黑名单
  * @Author: mzr
  * @Date: 2022-03-21 16:29:28
- * @LastEditTime: 2022-04-11 18:08:13
+ * @LastEditTime: 2022-04-15 09:05:17
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -133,8 +133,6 @@ function TicketScan() {
       })
       let newVal = JSON.parse(JSON.stringify(val))
       newVal.sales_channal_id = data
-      // newVal 对象
-      console.log('newVal', newVal)
       configForm.setFieldsValue(newVal)
 
     } else {
@@ -322,7 +320,6 @@ function TicketScan() {
             onCancel={() => setIsConfigModal(false)}
           >
             <Form
-
               form={configForm}
             >
 
