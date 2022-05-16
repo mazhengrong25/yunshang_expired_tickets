@@ -2,7 +2,7 @@
  * @Description: OPEN 处理列表
  * @Author: mzr
  * @Date: 2022-03-23 15:38:05
- * @LastEditTime: 2022-04-14 17:15:06
+ * @LastEditTime: 2022-04-29 09:22:58
  * @LastEditors: mzr
  */
 import React, { useState, useEffect } from "react";
@@ -54,6 +54,14 @@ function OpenList() {
       order_type: null, // 订单类型 为空时 placeholder没有效果
     }
   });
+
+  // 修改弹窗
+  const [modalConfig, setModalConfig] = useState({
+    trip_code: "", // 行程
+    second_ticket_status: "", // 客票状态
+    ticket_validity: "" // 客票有效期
+  })
+
   const [dataList, setDataList] = useState([]); // 数据列表
   const [dataListLoading, setDataListLoading] = useState(false); // 数据列表加载
   const [selectedList, setSelectedList] = useState({
@@ -73,6 +81,8 @@ function OpenList() {
   useEffect(() => {
     getDataList();
   }, [dataConfig]); //eslint-disable-line
+
+  useEffect(() => { }, [modalConfig])
 
   // 获取列表 
   function getDataList() {
@@ -653,6 +663,7 @@ function OpenList() {
             form={configForm}
             labelCol={{ span: 10 }}
             wrapperCol={{ span: 16 }}
+            initialValues={modalConfig}
           >
             <Form.Item label="行程" name="trip_code">
               <Input bordered={false} disabled />

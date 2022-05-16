@@ -16,6 +16,7 @@
     "react-scripts": "4.0.3",
     "sass": "^1.35.2",
     "scss-loader": "^0.0.1",
+    "serve": "^13.0.2",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
